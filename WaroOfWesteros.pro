@@ -15,7 +15,8 @@ SOURCES += \
     kingdom.cpp \
     main.cpp \
     mainwindow.cpp \
-    map.cpp
+    map.cpp \
+    resources.cpp
 
 HEADERS += \
     army.h \
@@ -23,7 +24,8 @@ HEADERS += \
     game.h \
     kingdom.h \
     mainwindow.h \
-    map.h
+    map.h \
+    resources.h
 
 FORMS += \
     mainwindow.ui
