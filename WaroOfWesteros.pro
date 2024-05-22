@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     army.cpp \
     building.cpp \
+    game.cpp \
     kingdom.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
 HEADERS += \
     army.h \
     building.h \
+    game.h \
     kingdom.h \
     mainwindow.h \
     map.h

@@ -51,6 +51,12 @@ private:
 public:
     //tworzy mape o podanym rozmiarze
     Map(int size_x, int size_y);
+    //zwraca szerokość mapy
+    int getMapWidth();
+    //zwraca wysokość mapy
+    int getMapHeight();
+    //zwraca kafelek o podanych współrzędnych
+    Map_tile* getTile(int x, int y);
 
 
 };

@@ -75,3 +75,17 @@ Map::Map(int size_x, int size_y)
     }
 }
 
+int Map::getMapWidth()
+{
+    return size_x;
+}
+
+int Map::getMapHeight()
+{
+    return size_y;
+}
+
+Map_tile* Map::getTile(int x, int y)
+{
+    return &map[x][y];
+}

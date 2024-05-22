@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "map.h"
+#include "game.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -9,7 +10,8 @@ int main(int argc, char *argv[])
     // w.show();
     // return a.exec();
 
-    Map mapa(10, 10);
+    Game* game = new Game();
+    game->startGame();
 
     return 0;
 }
