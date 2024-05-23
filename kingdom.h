@@ -1,10 +1,10 @@
 #ifndef KINGDOM_H
 #define KINGDOM_H
-#import <string>
-#import <vector>
-#import "resources.h"
-#import "army.h"
-#import "building.h"
+#include <string>
+#include <vector>
+#include "resources.h"
+#include "army.h"
+#include "building.h"
 
 class Kingdom
 {
