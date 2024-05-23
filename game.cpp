@@ -6,7 +6,7 @@ Game::Game() {
     KingdomSouth = new Kingdom();
     KingdomBeyondTheWall = new Kingdom();
     //inicjalizacja mapy
-    map = new Map(1000,1000);
+    map = new Map(100,100);
 
 }
 

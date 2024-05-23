@@ -3,6 +3,8 @@
 #include "kingdom.h"
 #include "map.h"
 
+
+
 class Game
 {
 private:
@@ -15,6 +17,9 @@ public:
     void startGame();
     void endGame();
     Map* getMap() {return map;}
+    Kingdom* getKingdomNorth() {return KingdomNorth;}
+    Kingdom* getKingdomSouth() {return KingdomSouth;}
+    Kingdom* getKingdomBeyondTheWall() {return KingdomBeyondTheWall;}
 };
 
 #endif // GAME_H

@@ -6,6 +6,10 @@
 #include "army.h"
 #include "building.h"
 
+
+class Game;
+
+
 class Kingdom
 {
 private:
@@ -19,7 +23,9 @@ public:
     Resources& getResources() {return resources;}
     Army& getArmy() {return army;}
     std::vector<Building>& getBuildings() {return buildings;}
-
+    void setName(std::string name) {this->name = name;}
+    std::string getName() {return name;}
+    void buildBuilding(int x, int y, Game *gra, int type);
 };
 
 #endif // KINGDOM_H

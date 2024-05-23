@@ -1,3 +1,8 @@
 #include "resources.h"
 
-Resources::Resources() {}
+Resources::Resources(int initGold, int initPopulation) {
+    gold = initGold;
+    population = initPopulation;
+}
+
+
