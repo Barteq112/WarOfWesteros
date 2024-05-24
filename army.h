@@ -22,37 +22,38 @@ public:
 // klasy dzidziczące po klasie Unit Giant, Infantry, Archer, Cavalry, Magician, Wolf, HeavyKnight
 class Giant : public Unit
 {
-
+    public:
+    Giant();
 };
 
 class Infantry : public Unit
 {
-
+    Infantry();
 };
 
 class Archer : public Unit
 {
-
+    Archer();
 };
 
 class Cavalry : public Unit
 {
-
+    Cavalry();
 };
 
 class Magician : public Unit
 {
-
+    Magician();
 };
 
 class Wolf : public Unit
 {
-
+    Wolf();
 };
 
 class HeavyKnight : public Unit
 {
-
+    HeavyKnight();
 };
 
 
