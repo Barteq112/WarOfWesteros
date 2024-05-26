@@ -1,17 +1,19 @@
 #include "kingdom.h"
 #include "game.h"
+#include "building.h"
 
-Kingdom::Kingdom() {}
+Kingdom::Kingdom() : resources(100,100) {}
 
-void buildBuilding(int x, int y, Game *gra, int type) {
-    Building building;
-    //dodanie budynku do listy budynków królestwa
-    buildings.push_back(building);
-    //dodanie budynku na mapie o danym rozmiarze
-    for(int i=x; i<x+building.getSizex(); i++) {
-        for(int j=y; j<y+building.getSizey(); j++) {
-            gra->getMap()->getTile(i,j)->setBuilding(&building);
-        }
+void Kingdom::buildMainCastle(int x, int y, Game *gra)
+{
+    if(gra->getMap()->placeIsAvailable(x,y,mainCastleSizeX,mainCastleSizeY))
+    {
+        return;
     }
+    std::shared_ptr<MainCastle> mainCastle = std::make_shared<MainCastle>();
+    buildings.push_back(mainCastle);
+    gra->getMap()->setBuildingOnMap(x,y,mainCastle);
 
 }
+
+

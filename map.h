@@ -2,16 +2,19 @@
 #define MAP_H
 
 #include <vector>
+#include<memory>
 #include "kingdom.h"
 #include "building.h"
 #include "army.h"
+
+class Game;
 
 class Map_tile
 {
 private:
     Kingdom* owner;
-    Building* building;
-    Unit* unit;
+    std::shared_ptr<Building> building;
+    std::shared_ptr<Unit> unit;
     bool isAvailable;
 
 
@@ -27,17 +30,18 @@ public:
     //ustawia właściciela kafelka
     void setOwner(Kingdom* owner);
     //zwraca budynek na kafelku
-    Building* getBuilding();
+    std::shared_ptr<Building> getBuilding();
     //ustawia budynek na kafelku
-    void setBuilding(Building* building);
+    void setBuilding(std::shared_ptr<Building> building);
     //usuwa budynek z kafelka
     void removeBuilding();
     //zwraca jednostkę na kafelku
-    Unit* getUnit();
+    std::shared_ptr<Unit> getUnit();
     //ustawia jednostkę na kafelku
-    void setUnit(Unit* unit);
+    void setUnit(std::shared_ptr<Unit> unit);
     //usuwa jednostkę z kafelka
     void removeUnit();
+
 
 };
 
@@ -57,6 +61,27 @@ public:
     int getMapHeight();
     //zwraca kafelek o podanych współrzędnych
     Map_tile* getTile(int x, int y);
+    //sprawdza czy kafelki pod budynek lub jednostkę są dostępne
+    bool placeIsAvailable(int x, int y, int sizex , int sizey);
+    //Zwraca najbliższą wrogą jednostkę w zasięgu od podanych współrzędnych
+    std::shared_ptr<Unit> getClosestEnemy(int x, int y, int range, int owner);
+    //Zwraca vector wrogich jednostek w zasięgu od podanych współrzędnych
+    std::vector<std::shared_ptr<Unit>> getEnemiesInRange(int x, int y, int range, int owner);
+    //Zwraca listę sojuszniczych jednostek w zasięgu od podanych współrzędnych
+    std::vector<std::shared_ptr<Unit>> getUnitsInRange(int x, int y, int range, int owner);
+    //Zwraca najbliższy wrogi budynek w zasięgu od podanych współrzędnych
+    std::shared_ptr<Building> getClosestEnemyBuilding(int x, int y, int range, int owner);
+    //Ustawia budynek na mapie w podanym miejscu o podanym rozmiarze i ustawia kafelki niedostępne
+    void setBuildingOnMap(int x, int y, std::shared_ptr<Building> building);
+    //Usuwa budynek z mapy i ustawia kafelki jako dostępne
+    void removeBuildingFromMap(int x, int y, std::shared_ptr<Building> building);
+    //Ustawa jednostkę na mapie w podanym miejscu i ustawia kafelki niedostępne
+    void setUnitOnMap(int x, int y, std::shared_ptr<Unit> unit);
+    //Usuwa jednostkę z mapy i ustawia kafelki jako dostępne
+    void removeUnitFromMap(int x, int y);
+
+
+
 
 
 };

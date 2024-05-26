@@ -1,74 +1,95 @@
 #ifndef ARMY_H
 #define ARMY_H
-#include <vector>
 
-class Unit
-{
-private:
+#include <vector>
+#include <memory>
+// Stale wymiary jednostki
+
+constexpr int unitSizeX =9;
+constexpr int unitSizeY =9;
+
+
+
+// Definicja klasy Unit
+class Unit {
+protected:
+    int x;
+    int y;
     int id;
     int health;
     int attackDamage;
     int speed;
+    int range;
+    int attackSpeed;
+    int owner; // 0 - South, 1 - North, 2 - BeyondTheWall
+
 public:
     Unit();
-    Unit( int health, int attackDamage, int speed);
-    int getHealth() {return health;}
-    virtual void attack(Unit *unit);
+    Unit(int health, int attackDamage, int speed, int range, int attackSpeed, int id);
+    int getID() const { return id; }
+    int getHealth() const { return health; }
+    int getOwner() const { return owner; }
+    virtual void attack(std::shared_ptr<Unit> unit);
     void increaseHealth(int amount);
     void decreaseHealth(int amount);
     void move();
+    virtual ~Unit() {}
 };
 
-// klasy dzidziczące po klasie Unit Giant, Infantry, Archer, Cavalry, Magician, Wolf, HeavyKnight
-class Giant : public Unit
-{
-    public:
-    Giant();
+// Klasy dziedziczące po klasie Unit
+class Giant : public Unit {
+public:
+    Giant(int id);
+    void attack(std::shared_ptr<Unit> unit) override;
 };
 
-class Infantry : public Unit
-{
-    Infantry();
+class Infantry : public Unit {
+public:
+    Infantry(int id);
+    void attack(std::shared_ptr<Unit> unit) override;
 };
 
-class Archer : public Unit
-{
-    Archer();
+class Archer : public Unit {
+public:
+    Archer(int id);
+    void attack(std::shared_ptr<Unit> unit) override;
 };
 
-class Cavalry : public Unit
-{
-    Cavalry();
+class Cavalry : public Unit {
+public:
+    Cavalry(int id);
+    void attack(std::shared_ptr<Unit> unit) override;
 };
 
-class Magician : public Unit
-{
-    Magician();
+class Magician : public Unit {
+public:
+    Magician(int id);
+    void attack(std::shared_ptr<Unit> unit) override;
 };
 
-class Wolf : public Unit
-{
-    Wolf();
+class Wolf : public Unit {
+public:
+    Wolf(int id);
+    void attack(std::shared_ptr<Unit> unit) override;
 };
 
-class HeavyKnight : public Unit
-{
-    HeavyKnight();
+class HeavyKnight : public Unit {
+public:
+    HeavyKnight(int id);
+    void attack(std::shared_ptr<Unit> unit) override;
 };
 
-
-
-class Army
-{
+// Definicja klasy Army
+class Army {
 private:
-    std::vector<Unit> *units;
+    std::vector<std::shared_ptr<Unit>> units;
+
 public:
     Army();
-    std::vector<Unit> getUnits() {return *units;}
-    void addUnit();
-    void removeUnit(Unit *unit);
+    std::vector<std::shared_ptr<Unit>> getUnits() const { return units; }
+    void addUnitToList(std::shared_ptr<Unit> unit);
+    void removeUnitFromList(std::shared_ptr<Unit> unit);
+    int checkLastID() const;
 };
-
-
 
 #endif // ARMY_H
