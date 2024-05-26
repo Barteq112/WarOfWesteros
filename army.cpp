@@ -2,23 +2,15 @@
 
 Army::Army() {}
 
-int Army::checkLastID() const {
-    //Sprawdza ostatnie ID jednostki
-    if (units.size() == 0) {
-        return 0;
-    }
-    else {
-        return units.back()->getID();
-    }
-}
 
-Unit::Unit( int health, int attackDamage, int attackSpeed, int Range, int speed, int id) {
+
+Unit::Unit( int health, int attackDamage, int attackSpeed, int Range, int speed, int type) {
     this->health = health;
     this->attackDamage = attackDamage;
     this->speed = speed;
     this->range = Range;
     this->attackSpeed = attackSpeed;
-    this->id = id;
+    this->type = type;
 }
 
 void Unit::increaseHealth(int amount) {
@@ -35,19 +27,19 @@ void Unit::attack(std::shared_ptr<Unit> unit){} ;
 
 //Konstruktor jednostek, inicjalizacja wartości początkowych -- health, attackDamage, attackSpeed, Range, speed, id
 
-Giant::Giant(int id) : Unit(300, 30, 1, 2, 1,id){};
+Giant::Giant() : Unit(300, 30, 1, 2, 1, 0){};
 
-Infantry::Infantry(int id) : Unit(150, 30, 3, 3, 3,id){};
+Infantry::Infantry() : Unit(150, 30, 3, 3, 3, 1){};
 
-Archer::Archer(int id) : Unit(80, 20, 5, 9, 4,id){};
+Archer::Archer() : Unit(80, 20, 5, 9, 4, 2){};
 
-Cavalry::Cavalry(int id) : Unit(200, 40, 2, 5, 6,id){};
+Cavalry::Cavalry() : Unit(200, 40, 2, 5, 6, 3){};
 
-Magician::Magician(int id) : Unit(300, 50, 2, 3, 1,id){};
+Magician::Magician() : Unit(300, 50, 2, 3, 1, 4){};
 
-Wolf::Wolf(int id) : Unit(300, 50, 2, 3, 1,id){};
+Wolf::Wolf() : Unit(300, 50, 2, 3, 1, 5){};
 
-HeavyKnight::HeavyKnight(int id) : Unit(300, 50, 2, 3, 1,id){};
+HeavyKnight::HeavyKnight() : Unit(300, 50, 2, 3, 1, 6){};
 
 
 //Atak poszczególnych jednostek

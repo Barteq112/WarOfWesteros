@@ -3,6 +3,9 @@
 #include "kingdom.h"
 #include "map.h"
 
+//Indeksy dla poszczególnych królestw 0 - South, 1 - North, 2 - BeyondTheWall
+//Indeksy poszczególnych budnynków 0 - MainCastle, 1 - Barracks, 2 - House
+//Inedksy poszczególnych jednostek 0 - Giant, 1 - Infantry, 2 - Archer, 3 - Cavalry, 4 - Magician, 5 - Wolf, 6 - HeavyKnight
 
 
 class Game

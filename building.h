@@ -15,13 +15,15 @@ constexpr int houseSizeY = 20;
 
 
 
+
 struct UnitPrice
 {
+    int type;
     std::string name;
     int price;
 };
 
-
+const UnitPrice northUnitPrice = {1, "", 100};
 
 //Typ budynku, 0- MainCastle, 1 - Barracks, 2 - House
 class Building
@@ -29,22 +31,24 @@ class Building
 protected:
     int x;
     int y;
-    int cost;
     int sizex;
     int sizey;
     int health;
     int owner;  // 0 - South, 1 - North, 2 - BeyondTheWall
     int type;
 public:
-    Building();
-    void removeBuilding();
-    void decreaseHealth(int amount);
-    void increaseHealth(int amount);
+    Building();                         //To też do zrobienia
+    void setX(int x){this->x = x;};
+    void setY(int y){this->y = y;};
+    void removeBuilding();              //Te 3 do zrobienia
+    void decreaseHealth(int amount);    //
+    void increaseHealth(int amount);    //
     int getSizex(){return sizex;};
     int getSizey(){return sizey;};
     int getOwner(){return owner;};
-    int getCost(){return cost;};
+    void setOwner(int owner){this->owner = owner;};
     int getHealth(){return health;};
+    int getType(){return type;};
 };
 
 class MainCastle : public Building
@@ -52,7 +56,8 @@ class MainCastle : public Building
 private:
     int level;
 public:
-    void upgradeCastle();
+    int getLevel(){return level;};
+    void upgradeCastle();           //To do zrobienia
     MainCastle() : level(0) {this->type = 0;  this->sizex = mainCastleSizeX; this->sizey = mainCastleSizeY; this->health = 1000;};
 };
 

@@ -15,18 +15,17 @@ class Unit {
 protected:
     int x;
     int y;
-    int id;
     int health;
     int attackDamage;
     int speed;
     int range;
     int attackSpeed;
+    int type; //--typy jednostek--- 0 - Giant, 1 - Infantry, 2 - Archer, 3 - Cavalry, 4 - Magician, 5 - Wolf, 6 - HeavyKnight
     int owner; // 0 - South, 1 - North, 2 - BeyondTheWall
 
 public:
     Unit();
-    Unit(int health, int attackDamage, int speed, int range, int attackSpeed, int id);
-    int getID() const { return id; }
+    Unit(int health, int attackDamage, int speed, int range, int attackSpeed, int type);
     int getHealth() const { return health; }
     int getOwner() const { return owner; }
     virtual void attack(std::shared_ptr<Unit> unit);
@@ -39,49 +38,50 @@ public:
 // Klasy dziedziczące po klasie Unit
 class Giant : public Unit {
 public:
-    Giant(int id);
+    Giant();
     void attack(std::shared_ptr<Unit> unit) override;
 };
 
 class Infantry : public Unit {
 public:
-    Infantry(int id);
+    Infantry();
     void attack(std::shared_ptr<Unit> unit) override;
 };
 
 class Archer : public Unit {
 public:
-    Archer(int id);
+    Archer();
     void attack(std::shared_ptr<Unit> unit) override;
 };
 
 class Cavalry : public Unit {
 public:
-    Cavalry(int id);
+    Cavalry();
     void attack(std::shared_ptr<Unit> unit) override;
 };
 
 class Magician : public Unit {
 public:
-    Magician(int id);
+    Magician();
     void attack(std::shared_ptr<Unit> unit) override;
 };
 
 class Wolf : public Unit {
 public:
-    Wolf(int id);
+    Wolf();
     void attack(std::shared_ptr<Unit> unit) override;
 };
 
 class HeavyKnight : public Unit {
 public:
-    HeavyKnight(int id);
+    HeavyKnight();
     void attack(std::shared_ptr<Unit> unit) override;
 };
 
 // Definicja klasy Army
 class Army {
 private:
+    int owner;
     std::vector<std::shared_ptr<Unit>> units;
 
 public:
@@ -89,7 +89,7 @@ public:
     std::vector<std::shared_ptr<Unit>> getUnits() const { return units; }
     void addUnitToList(std::shared_ptr<Unit> unit);
     void removeUnitFromList(std::shared_ptr<Unit> unit);
-    int checkLastID() const;
+    void setOwner(int owner) { this->owner = owner; }
 };
 
 #endif // ARMY_H

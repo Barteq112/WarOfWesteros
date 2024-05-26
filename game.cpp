@@ -7,7 +7,12 @@ Game::Game() {
     KingdomBeyondTheWall = new Kingdom();
     //inicjalizacja mapy
     map = new Map(1000,1000);
-
+    KingdomSouth->setOwner(0);
+    KingdomNorth->setOwner(1);
+    KingdomBeyondTheWall->setOwner(2);
+    KingdomSouth->setMap(this->map);
+    KingdomNorth->setMap(this->map);
+    KingdomBeyondTheWall->setMap(this->map);
 }
 
 void Game::endGame() {

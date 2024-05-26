@@ -8,16 +8,17 @@
 #include "building.h"
 
 
-class Game;
-
+class Map;
 
 class Kingdom
 {
 private:
+    int owner;
     std::string name;
     Resources resources;
     Army army;
     std::vector<std::shared_ptr<Building>> buildings;
+    Map* map;
 
 public:
     Kingdom();
@@ -26,9 +27,15 @@ public:
     std::vector<std::shared_ptr<Building>> getBuildings() {return buildings;}
     void setName(std::string name) {this->name = name;}
     std::string getName() {return name;}
-    void buildMainCastle(int x, int y, Game *gra);
-    void buildBarracks(int x, int y, Game *gra);
-    void buildHouse(int x, int y, Game *gra);
+    void buildMainCastle(int x, int y);
+    void buildBarracks(int x, int y);
+    void buildHouse(int x, int y);
+    //Sprawdza liczbę domów
+    int checkHouses();
+    //Sprawdza level zamku
+    int checkCastleLevel();
+    void setOwner(int owner) {this->owner = owner;}
+    void setMap(Map* map) {this->map = map;}
 };
 
 #endif // KINGDOM_H

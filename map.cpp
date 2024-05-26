@@ -1,7 +1,8 @@
 #include "map.h"
-#include <cmath>
+#include <queue>
 #include <limits>
-
+#include <cmath>
+#include <utility>
 
 //--------------------Klasa Map_tile----------------------------------
 
@@ -260,6 +261,37 @@ void Map::removeUnitFromMap(int x, int y)
             getTile(i,j)->removeUnit();
         }
     }
+}
+
+std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey) {
+    std::queue<std::pair<int, int>> tilesToCheck;
+    tilesToCheck.push({x, y});
+
+    std::vector<std::vector<bool>> visited(getMapWidth(), std::vector<bool>(getMapHeight(), false));
+    visited[x][y] = true;
+
+    int directions[4][2] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+
+    while (!tilesToCheck.empty()) {
+        auto [currentX, currentY] = tilesToCheck.front();
+        tilesToCheck.pop();
+
+        if (placeIsAvailable(currentX, currentY, sizex, sizey)) {
+            return {currentX, currentY};
+        }
+
+        for (auto& dir : directions) {
+            int newX = currentX + dir[0];
+            int newY = currentY + dir[1];
+
+            if (newX >= 0 && newY >= 0 && newX < getMapWidth() && newY < getMapHeight() && !visited[newX][newY]) {
+                tilesToCheck.push({newX, newY});
+                visited[newX][newY] = true;
+            }
+        }
+    }
+
+    return {-1, -1}; // Jeśli nie znaleziono wolnego miejsca
 }
 
 

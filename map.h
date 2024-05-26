@@ -79,6 +79,8 @@ public:
     void setUnitOnMap(int x, int y, std::shared_ptr<Unit> unit);
     //Usuwa jednostkę z mapy i ustawia kafelki jako dostępne
     void removeUnitFromMap(int x, int y);
+    //Znajduję najbliższe wolne miejsce od podanych współrzędnych i podanego rozmiaru
+    std::pair<int,int> findClosestFreeTile(int x, int y, int sizex, int sizey);
 
 
 
