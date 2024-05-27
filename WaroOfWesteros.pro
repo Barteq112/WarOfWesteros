@@ -37,3 +37,23 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+# Add SFML include and lib paths
+INCLUDEPATH += $$PWD/SFML-2.6.1/include
+LIBS += -L$$PWD/SFML-2.6.1/lib -lsfml-graphics -lsfml-window -lsfml-system
+
+
+# Copy SFML DLLs to build directory
+win32 {
+    CONFIG(debug, debug|release) {
+        DLL_DIR = $$PWD/SFML-2.6.1/bin
+        DEST_DIR = $$OUT_PWD/debug
+    } else {
+        DLL_DIR = $$PWD/SFML-2.6.1/bin
+        DEST_DIR = $$OUT_PWD/release
+    }
+
+    COPIES += copy_dlls
+    copy_dlls.files = $$files($$DLL_DIR/*.dll)
+    copy_dlls.path = $$DEST_DIR
+}

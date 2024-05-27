@@ -22,10 +22,12 @@ protected:
     int attackSpeed;
     int type; //--typy jednostek--- 0 - Giant, 1 - Infantry, 2 - Archer, 3 - Cavalry, 4 - Magician, 5 - Wolf, 6 - HeavyKnight
     int owner; // 0 - South, 1 - North, 2 - BeyondTheWall
+    bool inMotion;
 
 public:
-    Unit();
+    Unit(){this->inMotion = false;};
     Unit(int health, int attackDamage, int speed, int range, int attackSpeed, int type);
+    void setOwner(int owner) { this->owner = owner; }
     int getHealth() const { return health; }
     int getOwner() const { return owner; }
     virtual void attack(std::shared_ptr<Unit> unit);
@@ -90,6 +92,7 @@ public:
     void addUnitToList(std::shared_ptr<Unit> unit);
     void removeUnitFromList(std::shared_ptr<Unit> unit);
     void setOwner(int owner) { this->owner = owner; }
+
 };
 
 #endif // ARMY_H

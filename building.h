@@ -13,7 +13,7 @@ constexpr int houseSizeX = 20;
 constexpr int houseSizeY = 20;
 
 
-
+class Game;
 
 
 struct UnitPrice
@@ -23,7 +23,31 @@ struct UnitPrice
     int price;
 };
 
-const UnitPrice northUnitPrice = {1, "", 100};
+// Stałe struktury reprezentujące ceny jednostek dla każdego królestwa
+std::vector<UnitPrice> southUnitPrices = {
+    {1, "Infantry", 100},
+    {2, "Archer", 120},
+    {3, "Cavalry", 150},
+    {4, "Magician", 200},
+    {6, "HeavyKnight", 250}
+};
+
+std::vector<UnitPrice> northUnitPrices = {
+    {1, "Infantry", 100},
+    {2, "Archer", 120},
+    {3, "Cavalry", 150},
+    {4, "Magician", 200},
+    {5, "Wolf", 180}
+};
+
+std::vector<UnitPrice> beyondTheWallUnitPrices = {
+    {0, "Giant", 300},
+    {1, "Infantry", 100},
+    {2, "Archer", 120},
+    {3, "Cavalry", 150},
+    {4, "Magician", 200}
+};
+
 
 //Typ budynku, 0- MainCastle, 1 - Barracks, 2 - House
 class Building
@@ -38,6 +62,7 @@ protected:
     int type;
 public:
     Building();                         //To też do zrobienia
+    virtual ~Building() = default;
     void setX(int x){this->x = x;};
     void setY(int y){this->y = y;};
     void removeBuilding();              //Te 3 do zrobienia
@@ -68,9 +93,9 @@ private:
     std::vector<UnitPrice> availableUnits;
 
 public:
-    Barracks(){this->type = 1; this->sizex = barracksSizeX; this->sizey = barracksSizeY; this->health = 800;} ;
+    Barracks(); ;
     std::vector<UnitPrice> getAvailableUnits(){return availableUnits;};
-    void RecruitUnit(std::string name);
+    void RecruitUnit(int type, Game *game);
 
 };
 
