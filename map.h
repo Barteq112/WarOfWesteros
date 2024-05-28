@@ -12,10 +12,10 @@ class Game;
 class Map_tile
 {
 private:
-    Kingdom* owner;
+    int owner;
     std::shared_ptr<Building> building;
     std::shared_ptr<Unit> unit;
-    bool isAvailable;
+    bool isAvailable = true;
 
 
 public:
@@ -26,9 +26,9 @@ public:
     //ustawia czy kafelek jest dostępny
     void setIsAvailable(bool available);
     //zwraca właściciela kafelka
-    Kingdom* getOwner();
+    int getOwner();
     //ustawia właściciela kafelka
-    void setOwner(Kingdom* owner);
+    void setOwner(int owner);
     //zwraca budynek na kafelku
     std::shared_ptr<Building> getBuilding();
     //ustawia budynek na kafelku
@@ -63,6 +63,8 @@ public:
     Map_tile* getTile(int x, int y);
     //sprawdza czy kafelki pod budynek lub jednostkę są dostępne
     bool placeIsAvailable(int x, int y, int sizex , int sizey);
+    //sprawdza czy kafelki pod budynek są twoje
+    bool isYourPlace(int x, int y, int sizex, int sizey, int owner);
     //Zwraca najbliższą wrogą jednostkę w zasięgu od podanych współrzędnych
     std::shared_ptr<Unit> getClosestEnemy(int x, int y, int range, int owner);
     //Zwraca vector wrogich jednostek w zasięgu od podanych współrzędnych

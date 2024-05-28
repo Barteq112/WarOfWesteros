@@ -1,8 +1,12 @@
 #include "mainwindow.h"
 #include "game.h"
+#include "map.h"
 #include <QApplication>
 #include <iostream>
 #include <SFML/Graphics.hpp>
+
+
+
 
 int main(int argc, char *argv[])
 {
@@ -11,24 +15,28 @@ int main(int argc, char *argv[])
     // w.show();
     // return a.exec();
 
+
+
+
+
+
+
     Game* game = new Game();
     game->startGame();
 
     // testowe dodanie jednostek do armii północy i wyświetlenie ich
-    game->getKingdomNorth()->getArmy().addUnitToList(std::make_shared<Infantry>());
-    game->getKingdomNorth()->getArmy().addUnitToList(std::make_shared<Cavalry>());
+    game->getKingdomSouth()->buildBarracks(100,100);
+    auto barracks = std::dynamic_pointer_cast<Barracks>(game->getKingdomSouth()->getBuildings().at(0));
+    barracks->RecruitUnit(1,game);
 
-    // Kod SFML do wyświetlania okna
-    sf::RenderWindow window(sf::VideoMode(1600, 900), "SFML Test Window");
 
-    // Utwórz prostokąt
-    sf::RectangleShape rectangle(sf::Vector2f(9.f, 9.f));
-    rectangle.setFillColor(sf::Color::Green);
-    rectangle.setPosition(350.f, 275.f);
+    //Proste rysowanie mapy sfml do testowania budynek jeden kolor, jednostki drugi
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
+    auto mapa = game->getMap();
 
-    // Pętla główna SFML
     while (window.isOpen())
     {
+        // Obsługa zdarzeń
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -36,10 +44,34 @@ int main(int argc, char *argv[])
                 window.close();
         }
 
+        // Czyszczenie okna przed rysowaniem
         window.clear();
-        window.draw(rectangle);
-        window.display();
-    }
 
-    return 0;
+
+    for(int i=0;i<mapa->getMapWidth();i++)
+    {
+        for(int j=0;j<mapa->getMapHeight();j++)
+        {
+            if(mapa->getTile(i,j)->getBuilding()!=nullptr)
+            {
+                sf::RectangleShape rectangle(sf::Vector2f(1, 1));
+                rectangle.setPosition(i,j);
+                rectangle.setFillColor(sf::Color::Green);
+                window.draw(rectangle);
+            }
+            if(mapa->getTile(i,j)->getUnit()!=nullptr)
+            {
+                sf::RectangleShape rectangle(sf::Vector2f(1, 1));
+                rectangle.setPosition(i,j);
+                rectangle.setFillColor(sf::Color::Red);
+                window.draw(rectangle);
+            }
+        }
+    }
+    barracks->RecruitUnit(1,game);
+    window.display();
+
+
+    }
 }
+

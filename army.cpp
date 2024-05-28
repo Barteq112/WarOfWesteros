@@ -20,6 +20,11 @@ void Unit::increaseHealth(int amount) {
 void Unit::decreaseHealth(int amount) {
     health -= amount;
 }
+
+void Unit::move()
+{
+
+}
 void Unit::attack(std::shared_ptr<Unit> unit){} ;
 
 

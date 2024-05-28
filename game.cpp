@@ -22,16 +22,18 @@ void Game::endGame() {
     delete map;
 }
 
+
+// 0 - South, 1 - North, 2 - BeyondTheWall
 void Game::startGame() {
     //Podział mapy
     for(int i=0; i<map->getMapWidth(); i++) {
         for(int j=0; j<map->getMapHeight(); j++) {
-            if(i<map->getMapWidth()/3) {
-                map->getTile(i,j)->setOwner(KingdomNorth);
-            } else if(i<2*map->getMapWidth()/3) {
-                map->getTile(i,j)->setOwner(KingdomSouth);
+            if(i<map->getMapHeight()/3) {
+                map->getTile(i,j)->setOwner(0);
+            } else if(i<2*map->getMapHeight()/3) {
+                map->getTile(i,j)->setOwner(1);
             } else {
-                map->getTile(i,j)->setOwner(KingdomBeyondTheWall);
+                map->getTile(i,j)->setOwner(2);
             }
         }
     }

@@ -1,6 +1,5 @@
 #include "building.h"
 #include "game.h"
-
 Building::Building() {}
 
 Barracks::Barracks(){this->type = 1; this->sizex = barracksSizeX; this->sizey = barracksSizeY; this->health = 800;
@@ -37,6 +36,7 @@ void Barracks::RecruitUnit(int unitType, Game* game) {
         kingdom = game->getKingdomBeyondTheWall();
         break;
     default:
+
         return;
     }
 
@@ -79,10 +79,14 @@ void Barracks::RecruitUnit(int unitType, Game* game) {
     if (kingdom->getResources().getGold() < price) {
         return;
     }
+    auto[xx,yy] = map->findClosestFreeTile(x+int(barracksSizeX/2),y+int(barracksSizeY/2),unitSizeX,unitSizeY);
+    if(xx==-1)
+    {
+        return;
+    }
     kingdom->getResources().decreaseGold(price);
     unit->setOwner(owner);
     army->addUnitToList(unit);
-    auto[xx,yy] = map->findClosestFreeTile(x,y,unitSizeX,unitSizeY);
     map->setUnitOnMap(xx, yy, unit);
 
 }

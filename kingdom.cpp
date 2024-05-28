@@ -1,14 +1,15 @@
 #include "kingdom.h"
 #include "map.h"
 #include "building.h"
+#include <iostream>
 
-Kingdom::Kingdom() : resources(100,100) {
+Kingdom::Kingdom() : resources(10000,1000) {
     this->getArmy().setOwner(this->owner);
 }
 
 void Kingdom::buildMainCastle(int x, int y)
 {
-    if(map->placeIsAvailable(x,y,mainCastleSizeX,mainCastleSizeY))
+    if(map->placeIsAvailable(x,y,mainCastleSizeX,mainCastleSizeY)==false || map->isYourPlace(x,y,mainCastleSizeX,mainCastleSizeY,owner)==false)
     {
         return;
     }
@@ -23,8 +24,9 @@ void Kingdom::buildMainCastle(int x, int y)
 
 void Kingdom::buildBarracks(int x, int y)
 {
-    if(map->placeIsAvailable(x,y,barracksSizeX,barracksSizeY))
+    if(map->placeIsAvailable(x,y,barracksSizeX,barracksSizeY)==false || map->isYourPlace(x,y,mainCastleSizeX,mainCastleSizeY,owner)==false)
     {
+
         return;
     }
     std::shared_ptr<Barracks> barracks = std::make_shared<Barracks>();
@@ -37,7 +39,7 @@ void Kingdom::buildBarracks(int x, int y)
 
 void Kingdom::buildHouse(int x, int y)
 {
-    if(map->placeIsAvailable(x,y,houseSizeX,houseSizeY))
+    if(map->placeIsAvailable(x,y,houseSizeX,houseSizeY)==false || map->isYourPlace(x,y,mainCastleSizeX,mainCastleSizeY,owner)==false)
     {
         return;
     }

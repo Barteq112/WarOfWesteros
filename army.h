@@ -5,8 +5,8 @@
 #include <memory>
 // Stale wymiary jednostki
 
-constexpr int unitSizeX =9;
-constexpr int unitSizeY =9;
+constexpr int unitSizeX =17;
+constexpr int unitSizeY =17;
 
 
 
@@ -28,8 +28,8 @@ public:
     Unit(){this->inMotion = false;};
     Unit(int health, int attackDamage, int speed, int range, int attackSpeed, int type);
     void setOwner(int owner) { this->owner = owner; }
-    int getHealth() const { return health; }
-    int getOwner() const { return owner; }
+    int getHealth() { return health; }
+    int getOwner() { return owner; }
     virtual void attack(std::shared_ptr<Unit> unit);
     void increaseHealth(int amount);
     void decreaseHealth(int amount);
@@ -88,7 +88,7 @@ private:
 
 public:
     Army();
-    std::vector<std::shared_ptr<Unit>> getUnits() const { return units; }
+    std::vector<std::shared_ptr<Unit>> getUnits() { return units; }
     void addUnitToList(std::shared_ptr<Unit> unit);
     void removeUnitFromList(std::shared_ptr<Unit> unit);
     void setOwner(int owner) { this->owner = owner; }

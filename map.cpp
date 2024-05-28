@@ -3,12 +3,13 @@
 #include <limits>
 #include <cmath>
 #include <utility>
+#include <iostream>
 
 //--------------------Klasa Map_tile----------------------------------
 
 Map_tile::Map_tile()
 {
-    owner = nullptr;
+
     building = nullptr;
     unit = nullptr;
     isAvailable = true;
@@ -24,12 +25,12 @@ void Map_tile::setIsAvailable(bool available)
     this->isAvailable =available;
 }
 
-Kingdom* Map_tile::getOwner()
+int Map_tile::getOwner()
 {
     return owner;
 }
 
-void Map_tile::setOwner(Kingdom* owner)
+void Map_tile::setOwner(int owner)
 {
     this->owner = owner;
 }
@@ -114,6 +115,22 @@ bool Map::placeIsAvailable(int x, int y, int sizex , int sizey)
     }
     return true;
 }
+
+bool Map::isYourPlace(int x, int y, int sizex, int sizey, int owner)
+{
+    for(int i = x; i < x + sizex; i++)
+    {
+        for(int j = y; j < y + sizey; j++)
+        {
+            if(getTile(i,j)->getOwner() != owner)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 
 
 std::shared_ptr<Unit> Map::getClosestEnemy(int x, int y, int range, int owner)
@@ -238,11 +255,10 @@ void Map::removeBuildingFromMap(int x, int y, std::shared_ptr<Building> building
 
 void Map::setUnitOnMap(int x, int y, std::shared_ptr<Unit> unit)
 {
-    //standardowy rozmiar jednostki to 3x3
-    int sizex =3, sizey =3;
-    for(int i = x; i < x + sizex; i++)
+
+    for(int i = x; i < x + unitSizeX; i++)
     {
-        for(int j = y; j < y + sizey; j++)
+        for(int j = y; j < y + unitSizeY; j++)
         {
             getTile(i,j)->setUnit(unit);
         }
@@ -264,13 +280,15 @@ void Map::removeUnitFromMap(int x, int y)
 }
 
 std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey) {
+    const int stepSize = 2;
+
     std::queue<std::pair<int, int>> tilesToCheck;
     tilesToCheck.push({x, y});
 
     std::vector<std::vector<bool>> visited(getMapWidth(), std::vector<bool>(getMapHeight(), false));
     visited[x][y] = true;
 
-    int directions[4][2] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+    int directions[4][2] = {{stepSize, 0}, {0, stepSize}, {-stepSize, 0}, {0, -stepSize}};
 
     while (!tilesToCheck.empty()) {
         auto [currentX, currentY] = tilesToCheck.front();
@@ -290,8 +308,7 @@ std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey)
             }
         }
     }
-
-    return {-1, -1}; // Jeśli nie znaleziono wolnego miejsca
+    return {-1, -1};
 }
 
 
