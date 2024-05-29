@@ -116,6 +116,28 @@ bool Map::placeIsAvailable(int x, int y, int sizex , int sizey)
     return true;
 }
 
+bool Map::placeIsAvailableForUnit(int x, int y, int sizex, int sizey, std::shared_ptr<Unit> unit)
+{
+    for (int i = x; i < x + sizex; i++) {
+        for (int j = y; j < y + sizey; j++) {
+            // Sprawdzamy, czy współrzędne są w granicach mapy
+            if (i < 0 || i >= size_x || j < 0 || j >= size_y) {
+                return false;
+            }
+
+            // Pobieramy kafelek z mapy
+            Map_tile* tile = getTile(i, j);
+
+            // Jeśli kafelek jest niedostępny i nie zawiera tej jednostki, zwracamy false
+            if (!tile->getIsAvailable() && tile->getUnit() != unit) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+
 bool Map::isYourPlace(int x, int y, int sizex, int sizey, int owner)
 {
     for(int i = x; i < x + sizex; i++)
@@ -310,6 +332,20 @@ std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey)
     }
     return {-1, -1};
 }
+
+std::vector<std::vector<bool> > Map::getAvailableTiles()
+{
+    std::vector<std::vector<bool>> availableTiles(size_x, std::vector<bool>(size_y, false));
+    for(int i = 0; i < size_x; i++)
+    {
+        for(int j = 0; j < size_y; j++)
+        {
+            availableTiles[i][j] = getTile(i,j)->getIsAvailable();
+        }
+    }
+    return availableTiles;
+}
+
 
 
 

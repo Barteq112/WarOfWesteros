@@ -88,5 +88,7 @@ void Barracks::RecruitUnit(int unitType, Game* game) {
     unit->setOwner(owner);
     army->addUnitToList(unit);
     map->setUnitOnMap(xx, yy, unit);
+    unit->setX(xx);
+    unit->setY(yy);
 
 }

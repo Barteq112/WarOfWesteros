@@ -63,6 +63,8 @@ public:
     Map_tile* getTile(int x, int y);
     //sprawdza czy kafelki pod budynek lub jednostkę są dostępne
     bool placeIsAvailable(int x, int y, int sizex , int sizey);
+    //Sprawdza czy kafelki są dostępne dla jesnodtki, ale jeżeli on na tym kafelku toi to też zwraca jako dostępne
+    bool placeIsAvailableForUnit(int x, int y, int sizex, int sizey, std::shared_ptr<Unit> unit);
     //sprawdza czy kafelki pod budynek są twoje
     bool isYourPlace(int x, int y, int sizex, int sizey, int owner);
     //Zwraca najbliższą wrogą jednostkę w zasięgu od podanych współrzędnych
@@ -83,6 +85,8 @@ public:
     void removeUnitFromMap(int x, int y);
     //Znajduję najbliższe wolne miejsce od podanych współrzędnych i podanego rozmiaru
     std::pair<int,int> findClosestFreeTile(int x, int y, int sizex, int sizey);
+    //Zwraca mape dostępnych kafelków
+    std::vector<std::vector<bool>> getAvailableTiles();
 
 
 

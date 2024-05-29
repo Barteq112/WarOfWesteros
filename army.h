@@ -10,6 +10,10 @@ constexpr int unitSizeY =17;
 
 
 
+
+
+class Map;
+
 // Definicja klasy Unit
 class Unit {
 protected:
@@ -31,9 +35,13 @@ public:
     int getHealth() { return health; }
     int getOwner() { return owner; }
     virtual void attack(std::shared_ptr<Unit> unit);
+    void setX (int x) { this->x = x; }
+    void setY (int y) { this->y = y; }
     void increaseHealth(int amount);
     void decreaseHealth(int amount);
-    void move();
+    void move(Map* mapa, int goalX, int goalY);
+    std::vector<std::pair<int, int>> getPossibleMoves(int x, int y) const;
+
     virtual ~Unit() {}
 };
 
@@ -94,5 +102,8 @@ public:
     void setOwner(int owner) { this->owner = owner; }
 
 };
+
+
+
 
 #endif // ARMY_H

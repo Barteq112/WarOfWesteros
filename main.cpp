@@ -28,7 +28,9 @@ int main(int argc, char *argv[])
     game->getKingdomSouth()->buildBarracks(100,100);
     auto barracks = std::dynamic_pointer_cast<Barracks>(game->getKingdomSouth()->getBuildings().at(0));
     barracks->RecruitUnit(1,game);
-
+    auto unit = game->getKingdomSouth()->getArmy().getUnits().at(0);
+    std::cout<<unit->getHealth()<<std::endl;
+    unit->move(game->getMap(),170,170);
 
     //Proste rysowanie mapy sfml do testowania budynek jeden kolor, jednostki drugi
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
@@ -68,7 +70,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-    barracks->RecruitUnit(1,game);
     window.display();
 
 
