@@ -1,147 +1,86 @@
 #include "army.h"
 #include "map.h"
-#include <vector>
-#include <queue>
-#include <cmath>
 #include <algorithm>
-#include <memory>
+#include <vector>
 #include <iostream>
-//----------------------------------------------Algorytm A*-----------------------------------------------------
-// Definicja klasy Node
-// Definicja klasy Node
-class Node {
-public:
+#include <queue>  // Include queue for A* algorithm
+#include <unordered_set>  // Dodano unordered_set do śledzenia odwiedzonych węzłów
+
+//-------------------------------Astar--------------------------------------------
+
+struct Node {
     int x, y;
-    int g; // Koszt od startu do tego węzła
-    int h; // Heurystyczny koszt do celu
-    int f; // Całkowity koszt (g + h)
+    int gScore, hScore, fScore;
     Node* parent;
 
-    Node(int x, int y, Node* parent = nullptr) : x(x), y(y), g(0), h(0), f(0), parent(parent) {}
+    Node(int x, int y) : x(x), y(y), gScore(0), hScore(0), fScore(0), parent(nullptr) {}
 
-    void calculateHeuristic(int goalX, int goalY) {
-        h = std::abs(goalX - x) + std::abs(goalY - y); // Manhattan distance
+    bool operator<(const Node& other) const {
+        return fScore > other.fScore;
     }
 
-    void calculateTotalCost() {
-        f = g + h;
+    bool operator==(const Node& other) const {
+        return x == other.x && y == other.y;
     }
+
+    struct HashFunction {
+        size_t operator()(const Node& node) const {
+            return std::hash<int>()(node.x) ^ std::hash<int>()(node.y);
+        }
+    };
 };
 
-// Funktor do porównywania węzłów w kolejce priorytetowej
-struct CompareNode {
-    bool operator()(Node* a, Node* b) {
-        return a->f > b->f;
-    }
-};
+std::vector<std::pair<int, int>> AStar(Map* map, int startX, int startY, int goalX, int goalY) {
+    std::priority_queue<Node> openSet;
+    std::unordered_set<Node, Node::HashFunction> closedSet;
 
-
-
-std::pair<int, int> findFirstMoveAStar(Map *mapa,
-                                       int startX, int startY, int goalX, int goalY,
-                                       int unitSizeX, int unitSizeY) {
-    auto map = mapa->getAvailableTiles();
-    int width = map.size();
-    int height = map[0].size();
-    std::cout<<startX<<startY<<std::endl;
-    // Sprawdzenie, czy mapa nie jest pusta
-    if (width == 0 || height == 0) {
-        std::cerr << "Map dimensions are invalid: width or height is zero\n";
-        return {-1, -1};
-    }
-    auto unit = mapa->getTile(startX, startY)->getUnit();
-    // Sprawdzenie poprawności startowej i końcowej pozycji
-    if ( !mapa->placeIsAvailableForUnit(goalX,goalY,unitSizeX,unitSizeY,unit)) {
-        std::cerr << "Goal position is not available\n";
-        return {-1, -1};
-    }
-
-
-    // Inicjalizacja zbioru zamkniętego
-    std::vector<std::vector<bool>> closedSet(width, std::vector<bool>(height, false)); // Zbiór odwiedzonych węzłów
-    std::priority_queue<Node*, std::vector<Node*>, CompareNode> openSet; // Priorytetowa kolejka otwartych węzłów
-
-    // Tworzenie węzła startowego
-    Node* startNode = new Node(startX, startY);
-    startNode->calculateHeuristic(goalX, goalY);
-    startNode->calculateTotalCost();
-    openSet.push(startNode);
+    Node start(startX, startY);
+    start.gScore = 0;
+    start.hScore = abs(startX - goalX) + abs(startY - goalY);
+    start.fScore = start.gScore + start.hScore;
+    openSet.push(start);
 
     while (!openSet.empty()) {
-        // Pobieranie węzła z najmniejszym kosztem f z priorytetowej kolejki
-        Node* current = openSet.top();
+        Node current = openSet.top();
         openSet.pop();
 
-        // Logowanie bieżącej pozycji
-        std::cerr << "Processing node at (" << current->x << ", " << current->y << ")\n";
-
-        // Sprawdzanie, czy bieżący węzeł jest w granicach mapy
-        if (current->x < 0 || current->x >= width || current->y < 0 || current->y >= height) {
-            std::cerr << "Node out of bounds: (" << current->x << ", " << current->y << ")\n";
-            delete current;
-            continue;
+        if (current.x == goalX && current.y == goalY) {
+            std::vector<std::pair<int, int>> path;
+            for (Node* node = &current; node; node = node->parent) {
+                path.push_back(std::make_pair(node->x, node->y));
+            }
+            std::reverse(path.begin(), path.end());
+            return path;
         }
 
-        // Jeśli dotarliśmy do celu, prześledźmy ścieżkę do początku, aby znaleźć pierwszy ruch
-        if (current->x == goalX && current->y == goalY) {
-            Node* pathNode = current;
-            while (pathNode->parent && pathNode->parent->parent) {
-                pathNode = pathNode->parent;
-            }
-            std::pair<int, int> firstMove = {pathNode->x, pathNode->y};
-            // Zwolnienie pamięci
-            while (current) {
-                Node* parent = current->parent;
-                delete current;
-                current = parent;
-            }
-            return firstMove;
-        }
+        closedSet.insert(current);
 
-        // Oznaczamy bieżący węzeł jako odwiedzony
-        closedSet[current->x][current->y] = true;
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                if ((dx == 0 && dy == 0) || (abs(dx) == abs(dy) && !map->getTile(current.x + dx, current.y + dy)->getIsAvailable())) {
+                    continue;
+                }
 
-        // Generujemy następników bieżącego węzła
-        static const std::vector<std::pair<int, int>> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
-        for (const auto& direction : directions) {
-            int nx = current->x + direction.first;
-            int ny = current->y + direction.second;
+                int neighborX = current.x + dx;
+                int neighborY = current.y + dy;
 
-            // Sprawdzamy, czy nowe współrzędne są w granicach mapy i czy są dostępne
-            if (nx >= 0 && nx < width && ny >= 0 && ny < height && !closedSet[nx][ny] && mapa->placeIsAvailableForUnit(nx, ny, unitSizeX, unitSizeY,unit)) {
-                // Tworzenie nowego węzła
-                Node* neighbor = new Node(nx, ny, current);
-                neighbor->g = current->g + 1; // Koszt ruchu do sąsiada
-                neighbor->calculateHeuristic(goalX, goalY); // Obliczamy heurystyczną wartość odległości do celu
-                neighbor->calculateTotalCost(); // Obliczamy całkowity koszt f
+                if (neighborX >= 0 && neighborX < map->getMapWidth() && neighborY >= 0 && neighborY < map->getMapHeight() && map->getTile(neighborX, neighborY)->getIsAvailable()) {
+                    Node neighbor(neighborX, neighborY);
+                    neighbor.gScore = current.gScore + 1;
+                    neighbor.hScore = abs(neighborX - goalX) + abs(neighborY - goalY);
+                    neighbor.fScore = neighbor.gScore + neighbor.hScore;
+                    neighbor.parent = new Node(current);
 
-                // Logowanie nowo utworzonego węzła
-                std::cerr << "Adding neighbor node at (" << nx << ", " << ny << ") with f = " << neighbor->f << "\n";
-
-                // Dodajemy sąsiada do priorytetowej kolejki
-                openSet.push(neighbor);
-            } else if (nx < 0 || nx >= width || ny < 0 || ny >= height) {
-                std::cerr << "Skipped out of bounds neighbor node at (" << nx << ", " << ny << ")\n";
-            } else if (closedSet[nx][ny]) {
-                std::cerr << "Skipped already closed neighbor node at (" << nx << ", " << ny << ")\n";
-            } else if (!mapa->placeIsAvailable(nx, ny, unitSizeX, unitSizeY)) {
-                std::cerr << "Skipped unavailable place for neighbor node at (" << nx << ", " << ny << ")\n";
+                    if (closedSet.find(neighbor) == closedSet.end()) {
+                        openSet.push(neighbor);
+                    }
+                }
             }
         }
-
-        // Zwolnienie pamięci bieżącego węzła
-        delete current;
     }
 
-    // Jeśli nie udało się znaleźć pierwszego ruchu, zwracamy (-1, -1)
-    std::cerr << "No valid path found\n";
-    return {-1, -1};
+    return std::vector<std::pair<int, int>>();
 }
-
-
-
-
-
 
 
 //-----------------------------Klasa Army----------------------------------
@@ -168,29 +107,25 @@ void Unit::decreaseHealth(int amount) {
     health -= amount;
 }
 
-void Unit::move(Map* mapa, int goalX, int goalY) {
-    std::pair<int, int> nextPosition = findFirstMoveAStar(mapa, x, y, goalX, goalY, unitSizeX,unitSizeY);
-    std::cout<<nextPosition.first<<nextPosition.second;
-}
-
-
-
-
-std::vector<std::pair<int, int> > Unit::getPossibleMoves(int x, int y) const
-{
-    std::vector<std::pair<int, int>> moves;
-    for (int dx = -speed; dx <= speed; ++dx) {
-        for (int dy = -speed; dy <= speed; ++dy) {
-            int nx = x + dx;
-            int ny = y + dy;
-            if (abs(dx) + abs(dy) <= speed && nx >= 0 && ny >= 0) {
-                moves.emplace_back(nx, ny);
-            }
-        }
+void Unit::move(Map* map, int goalX, int goalY) {
+    if (x == goalX && y == goalY) {
+        return;
     }
-    return moves;
+    auto path = AStar(map, x, y, goalX, goalY);
+    // poruszanie się zgodnie z wyznaczoną ścieżką
 
+    auto unit = map->getTile(x, y)->getUnit();
+    map->getTile(x, y)->setUnit(nullptr);
+    this->setX(path[1].first);
+    this->setY(path[1].second);
+    std::cout<<x<<" "<<y<<std::endl;
+    map->getTile(x, y)->setUnit(unit);
 }
+
+
+
+
+
 void Unit::attack(std::shared_ptr<Unit> unit){} ;
 
 

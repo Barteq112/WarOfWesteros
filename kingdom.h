@@ -6,9 +6,8 @@
 #include "resources.h"
 #include "army.h"
 #include "building.h"
+#include "map.h"
 
-
-class Map;
 
 class Kingdom
 {

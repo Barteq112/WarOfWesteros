@@ -5,12 +5,12 @@
 #include <vector>
 
 //Stałe wymiary budynków
-constexpr int mainCastleSizeX = 54;
-constexpr int mainCastleSizeY = 90;
-constexpr int barracksSizeX = 50;
-constexpr int barracksSizeY = 50;
-constexpr int houseSizeX = 40;
-constexpr int houseSizeY = 40;
+constexpr int mainCastleSizeX = 3;
+constexpr int mainCastleSizeY = 4;
+constexpr int barracksSizeX = 3;
+constexpr int barracksSizeY = 3;
+constexpr int houseSizeX = 2;
+constexpr int houseSizeY = 2;
 
 
 class Game;

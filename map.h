@@ -3,7 +3,6 @@
 
 #include <vector>
 #include<memory>
-#include "kingdom.h"
 #include "building.h"
 #include "army.h"
 

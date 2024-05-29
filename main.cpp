@@ -5,8 +5,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-
-
+const int TILE_SIZE = 10; // Rozmiar jednej płytki w pikselach
 
 int main(int argc, char *argv[])
 {
@@ -14,27 +13,25 @@ int main(int argc, char *argv[])
     // MainWindow w;
     // w.show();
     // return a.exec();
-
-
-
-
-
-
-
     Game* game = new Game();
     game->startGame();
 
-    // testowe dodanie jednostek do armii północy i wyświetlenie ich
-    game->getKingdomSouth()->buildBarracks(100,100);
+    // testowe dodanie jednostek do armii południa i wyświetlenie ich
+    game->getKingdomSouth()->buildBarracks(0, 0);
+    game->getKingdomNorth()->buildHouse(45,44);
     auto barracks = std::dynamic_pointer_cast<Barracks>(game->getKingdomSouth()->getBuildings().at(0));
-    barracks->RecruitUnit(1,game);
+    barracks->RecruitUnit(1, game);
     auto unit = game->getKingdomSouth()->getArmy().getUnits().at(0);
-    std::cout<<unit->getHealth()<<std::endl;
-    unit->move(game->getMap(),170,170);
+    std::cout << unit->getHealth() << std::endl;
 
-    //Proste rysowanie mapy sfml do testowania budynek jeden kolor, jednostki drugi
-    sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
+
+    // Obliczenie rozmiarów okna na podstawie rozmiaru mapy
     auto mapa = game->getMap();
+    int windowWidth = mapa->getMapWidth() * TILE_SIZE;
+    int windowHeight = mapa->getMapHeight() * TILE_SIZE;
+
+    // Tworzenie okna SFML
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
 
     while (window.isOpen())
     {
@@ -49,30 +46,29 @@ int main(int argc, char *argv[])
         // Czyszczenie okna przed rysowaniem
         window.clear();
 
-
-    for(int i=0;i<mapa->getMapWidth();i++)
-    {
-        for(int j=0;j<mapa->getMapHeight();j++)
+        for (int i = 0; i < mapa->getMapWidth(); i++)
         {
-            if(mapa->getTile(i,j)->getBuilding()!=nullptr)
+            for (int j = 0; j < mapa->getMapHeight(); j++)
             {
-                sf::RectangleShape rectangle(sf::Vector2f(1, 1));
-                rectangle.setPosition(i,j);
-                rectangle.setFillColor(sf::Color::Green);
-                window.draw(rectangle);
-            }
-            if(mapa->getTile(i,j)->getUnit()!=nullptr)
-            {
-                sf::RectangleShape rectangle(sf::Vector2f(1, 1));
-                rectangle.setPosition(i,j);
-                rectangle.setFillColor(sf::Color::Red);
-                window.draw(rectangle);
+                if (mapa->getTile(i, j)->getBuilding() != nullptr)
+                {
+                    sf::RectangleShape rectangle(sf::Vector2f(TILE_SIZE, TILE_SIZE));
+                    rectangle.setPosition(i * TILE_SIZE, j * TILE_SIZE);
+                    rectangle.setFillColor(sf::Color::Green);
+                    window.draw(rectangle);
+                }
+                if (mapa->getTile(i, j)->getUnit() != nullptr)
+                {
+                    sf::RectangleShape rectangle(sf::Vector2f(TILE_SIZE, TILE_SIZE));
+                    rectangle.setPosition(i * TILE_SIZE, j * TILE_SIZE);
+                    rectangle.setFillColor(sf::Color::Red);
+                    window.draw(rectangle);
+                }
             }
         }
-    }
-    window.display();
-
-
+        window.display();
+        //opóźnienie 1s
+        sf::sleep(sf::seconds(0.2));
+        unit->move(game->getMap(), 50, 50);
     }
 }
-

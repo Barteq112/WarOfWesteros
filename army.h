@@ -5,8 +5,8 @@
 #include <memory>
 // Stale wymiary jednostki
 
-constexpr int unitSizeX =17;
-constexpr int unitSizeY =17;
+constexpr int unitSizeX =1;
+constexpr int unitSizeY =1;
 
 
 
@@ -40,7 +40,6 @@ public:
     void increaseHealth(int amount);
     void decreaseHealth(int amount);
     void move(Map* mapa, int goalX, int goalY);
-    std::vector<std::pair<int, int>> getPossibleMoves(int x, int y) const;
 
     virtual ~Unit() {}
 };
