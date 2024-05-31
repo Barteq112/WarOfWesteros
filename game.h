@@ -19,6 +19,7 @@ public:
     Game();
     void startGame();
     void endGame();
+    void autoMoveAttack();
     Map* getMap() {return map;}
     Kingdom* getKingdomNorth() {return KingdomNorth;}
     Kingdom* getKingdomSouth() {return KingdomSouth;}

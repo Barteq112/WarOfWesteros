@@ -2,7 +2,40 @@
 #include "game.h"
 Building::Building() {}
 
+void Building::removeBuilding(Map *map)
+{
+    //Usuwa budynek z mapy ze wszystkich kafelków i z listy budynków
+    for (int i = 0; i < sizex; i++)
+    {
+        for (int j = 0; j < sizey; j++)
+        {
+            map->getTile(x + i, y + j)->removeBuilding();
+        }
+    }
+
+}
+
+void Building::decreaseHealth(int amount, Map *map)
+{
+    health -= amount;
+    if (health <= 0)
+    {
+        removeBuilding(map);
+    }
+}
+
+void Building::increaseHealth(int amount)
+{
+    health += amount;
+    if (health > maxHealth)
+    {
+        health = maxHealth;
+    }
+}
+
+
 Barracks::Barracks(){this->type = 1; this->sizex = barracksSizeX; this->sizey = barracksSizeY; this->health = 800;
+    this->maxHealth = 800;
     std::vector<UnitPrice> unitPrices;
     switch (owner) {
     case 0: // South
@@ -90,5 +123,6 @@ void Barracks::RecruitUnit(int unitType, Game* game) {
     map->setUnitOnMap(xx, yy, unit);
     unit->setX(xx);
     unit->setY(yy);
+    unit->setDestination(xx,yy);
 
 }

@@ -1,4 +1,7 @@
 #include "game.h"
+#include <algorithm>
+#include <iostream>
+#include <ostream>
 
 Game::Game() {
     //inicjalizacja królestw
@@ -38,6 +41,47 @@ void Game::startGame() {
         }
     }
 
+}
+
+
+void Game::autoMoveAttack()
+{
+
+    std::vector<std::shared_ptr<Unit>> allUnits;
+
+    // Sprawdzenie, czy królestwa mają jednostki, zanim je dodamy do allUnits
+    auto southUnits = getKingdomSouth()->getArmy().getUnits();
+    if (!southUnits.empty()) {
+        allUnits.insert(allUnits.end(), southUnits.begin(), southUnits.end());
+    }
+
+    auto beyondTheWallUnits = getKingdomBeyondTheWall()->getArmy().getUnits();
+    if (!beyondTheWallUnits.empty()) {
+        allUnits.insert(allUnits.end(), beyondTheWallUnits.begin(), beyondTheWallUnits.end());
+    }
+
+    auto northUnits = getKingdomNorth()->getArmy().getUnits();
+    if (!northUnits.empty()) {
+        allUnits.insert(allUnits.end(), northUnits.begin(), northUnits.end());
+    }
+
+
+
+    // Przemieszaj jednostki
+    if(allUnits.size() > 1)
+        std::random_shuffle(allUnits.begin(), allUnits.end());
+    // Przejdź po liście i wykonaj ruch każdej jednostki
+    for (auto unit : allUnits)
+    {
+        // Jeśli jednostka nie jest w ruchu to wybierz losowy kierunek
+        if (unit->inMotion())
+        {
+
+            unit->move(this->getMap());
+        }
+        unit->attack(this->getMap());
+
+    }
 }
 
 

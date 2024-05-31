@@ -4,35 +4,18 @@
 #include <QApplication>
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <thread>
 
 const int TILE_SIZE = 10; // Rozmiar jednej płytki w pikselach
-
-int main(int argc, char *argv[])
+void drawMap(Map* mapa)
 {
-    // QApplication a(argc, argv);
-    // MainWindow w;
-    // w.show();
-    // return a.exec();
-    Game* game = new Game();
-    game->startGame();
-
-    // testowe dodanie jednostek do armii południa i wyświetlenie ich
-    game->getKingdomSouth()->buildBarracks(0, 0);
-    game->getKingdomNorth()->buildHouse(45,44);
-    auto barracks = std::dynamic_pointer_cast<Barracks>(game->getKingdomSouth()->getBuildings().at(0));
-    barracks->RecruitUnit(1, game);
-    auto unit = game->getKingdomSouth()->getArmy().getUnits().at(0);
-    std::cout << unit->getHealth() << std::endl;
-
-
     // Obliczenie rozmiarów okna na podstawie rozmiaru mapy
-    auto mapa = game->getMap();
+
     int windowWidth = mapa->getMapWidth() * TILE_SIZE;
     int windowHeight = mapa->getMapHeight() * TILE_SIZE;
 
     // Tworzenie okna SFML
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
-
     while (window.isOpen())
     {
         // Obsługa zdarzeń
@@ -67,8 +50,61 @@ int main(int argc, char *argv[])
             }
         }
         window.display();
-        //opóźnienie 1s
-        sf::sleep(sf::seconds(0.2));
-        unit->move(game->getMap(), 50, 50);
     }
+}
+
+void moveUnit(Game* game)
+{
+    while (true)
+    {
+        game->autoMoveAttack();
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    // QApplication a(argc, argv);
+    // MainWindow w;
+    // w.show();
+    // return a.exec();
+    Game* game = new Game();
+    game->startGame();
+
+    // testowe dodanie jednostek do armii południa i wyświetlenie ich
+    game->getKingdomSouth()->buildBarracks(0, 0);
+    game->getKingdomNorth()->buildHouse(45,44);
+    auto barracks = std::dynamic_pointer_cast<Barracks>(game->getKingdomSouth()->getBuildings().at(0));
+    barracks->RecruitUnit(1, game);
+    auto unit = game->getKingdomSouth()->getArmy().getUnits().at(0);
+    std::cout << unit->getHealth() << std::endl;
+    auto mapa = game->getMap();
+    std::thread thread1(drawMap, mapa);
+    std::thread thread2(moveUnit,game);
+
+    while (true)
+    {
+        //Podajesz współrzędne i zmienia się kierunek
+        int x, y;
+        std::cout<<"Podaj x: ";
+        std::cin >> x;
+        std::cout<<"\nPodaj y: ";
+        std::cin>> y;
+        unit->setDestination(x,y);
+    }
+
+
+
+
+
+
+
+
+    thread1.join();
+
+    //prosty interfejst do sterowania unit w konsoli
+
+
+
+
 }

@@ -14,6 +14,7 @@ constexpr int houseSizeY = 2;
 
 
 class Game;
+class Map;
 
 
 struct UnitPrice
@@ -57,6 +58,7 @@ protected:
     int y;
     int sizex;
     int sizey;
+    int maxHealth;
     int health;
     int owner;  // 0 - South, 1 - North, 2 - BeyondTheWall
     int type;
@@ -65,8 +67,8 @@ public:
     virtual ~Building() = default;
     void setX(int x){this->x = x;};
     void setY(int y){this->y = y;};
-    void removeBuilding();              //Te 3 do zrobienia
-    void decreaseHealth(int amount);    //
+    void removeBuilding(Map *map);              //Te 3 do zrobienia
+    void decreaseHealth(int amount,Map *map);    //
     void increaseHealth(int amount);    //
     int getSizex(){return sizex;};
     int getSizey(){return sizey;};
@@ -83,7 +85,8 @@ private:
 public:
     int getLevel(){return level;};
     void upgradeCastle();           //To do zrobienia
-    MainCastle() : level(0) {this->type = 0;  this->sizex = mainCastleSizeX; this->sizey = mainCastleSizeY; this->health = 1000;};
+    MainCastle() : level(0) {this->type = 0;  this->sizex = mainCastleSizeX;
+        this->sizey = mainCastleSizeY; this->health = 1000;this->maxHealth = 1000;};
 };
 
 class Barracks : public Building
@@ -104,7 +107,8 @@ class House : public Building
     private:
         int HousePopulation;
     public:
-        House(){this->type = 2; this->sizex = houseSizeX; this->sizey = houseSizeY; this->health = 500; this->HousePopulation = 10;};
+        House(){this->type = 2; this->sizex = houseSizeX; this->sizey = houseSizeY;
+            this->health = 500; this->maxHealth = 500;this->HousePopulation = 10;};
         //Usuwa populacje z królestwa po zniszczeniu domu
         void DeletePopulation(int amount);
 

@@ -101,81 +101,210 @@ Unit::Unit( int health, int attackDamage, int attackSpeed, int Range, int speed,
 
 void Unit::increaseHealth(int amount) {
     health += amount;
+    if (health > maxHealth) {
+        health = maxHealth;
+    }
 }
 
 void Unit::decreaseHealth(int amount) {
     health -= amount;
 }
 
-void Unit::move(Map* map, int goalX, int goalY) {
-    if (x == goalX && y == goalY) {
+void Unit::move(Map* map) {
+    if (x == destX && y == destY) {
         return;
     }
-    auto path = AStar(map, x, y, goalX, goalY);
+    // sprawdzenie czy docelowe pole jest dostępne, jeśli nie to szukamy najbliższego wolnego pola
+    if(map->getTile(destX, destY)->getIsAvailable() == false) {
+        auto[tmpX,tmpy] = map->findClosestFreeTile(destX, destY,unitSizeX,unitSizeY);
+        destX = tmpX;
+        destY = tmpy;
+    }
+    auto path = AStar(map, x, y, destX, destY);
+    // jeśli ścieżka jest pusta, to cel nie jest osiągalny, więc nie ruszamy jednostki
+    if(path.empty()) {
+        destX = x;
+        destY = y;
+        return;
+    }
     // poruszanie się zgodnie z wyznaczoną ścieżką
-
     auto unit = map->getTile(x, y)->getUnit();
     map->getTile(x, y)->setUnit(nullptr);
     this->setX(path[1].first);
     this->setY(path[1].second);
-    std::cout<<x<<" "<<y<<std::endl;
     map->getTile(x, y)->setUnit(unit);
+}
+
+bool Unit::inMotion()
+{
+    return x != destX || y != destY;
 }
 
 
 
 
 
-void Unit::attack(std::shared_ptr<Unit> unit){} ;
+
+
+
+void Unit::attack(Map *map){} ;
 
 
 
 
 //Konstruktor jednostek, inicjalizacja wartości początkowych -- health, attackDamage, attackSpeed, Range, speed, id
 
-Giant::Giant() : Unit(300, 30, 1, 2, 1, 0){};
+Giant::Giant() : Unit(300, 30, 1, 2, 1, 0){maxHealth = health;};
 
-Infantry::Infantry() : Unit(150, 30, 3, 3, 3, 1){};
+Infantry::Infantry() : Unit(150, 30, 3, 3, 3, 1){maxHealth = health;};
 
-Archer::Archer() : Unit(80, 20, 5, 9, 4, 2){};
+Archer::Archer() : Unit(80, 20, 5, 9, 4, 2){maxHealth = health;};
 
-Cavalry::Cavalry() : Unit(200, 40, 2, 5, 6, 3){};
+Cavalry::Cavalry() : Unit(200, 40, 2, 5, 6, 3){maxHealth = health;};
 
-Magician::Magician() : Unit(300, 50, 2, 3, 1, 4){};
+Magician::Magician() : Unit(300, 50, 2, 3, 1, 4){maxHealth = health;};
 
-Wolf::Wolf() : Unit(300, 50, 2, 3, 1, 5){};
+Wolf::Wolf() : Unit(300, 50, 2, 3, 1, 5){maxHealth = health;};
 
-HeavyKnight::HeavyKnight() : Unit(300, 50, 2, 3, 1, 6){};
+HeavyKnight::HeavyKnight() : Unit(300, 50, 2, 3, 1, 6){maxHealth = health;};
 
 
 //Atak poszczególnych jednostek
 
-void Giant::attack(std::shared_ptr<Unit> unit) {
-    unit->decreaseHealth(attackDamage);
+void Giant::attack(Map *map) {
+    if(inMotion())
+        return;
+    //Pobiera wrogie jednostki w zasięgu i zadaje im obrażenia
+    auto units = map->getEnemiesInRange(x, y, range, owner);
+    for (auto unit : units) {
+        unit->decreaseHealth(attackDamage);
+    }
+    if(units.empty())
+    {
+        //Jeżeli nie ma wroga w zasięgu atakuję najbliższy wrogi budynek
+        auto building = map->getClosestEnemyBuilding(x,y,range,owner);
+        if(building != nullptr)
+        {
+            building->decreaseHealth(attackDamage/2,map);
+        }
+    }
 }
 
-void Infantry::attack(std::shared_ptr<Unit> unit) {
-    unit->decreaseHealth(attackDamage);
+void Infantry::attack(Map *map) {
+    if(inMotion())
+        return;
+    //Pobiera najbliższego woga i zadaje dmg w zależności od ilości hp
+    auto unit = map->getClosestEnemy(x, y,range, owner);
+    if(unit != nullptr)
+    {
+        int baseDamage = attackDamage/2;
+        int Dammage = baseDamage + attackDamage/2*(health/maxHealth);
+        unit->decreaseHealth(Dammage);
+    }
+    else
+    {
+      //Jeżeli nie ma wroga w zasięgu atakuję najbliższy wrogi budynek
+        auto building = map->getClosestEnemyBuilding(x,y,range,owner);
+        if(building != nullptr)
+        {
+            building->decreaseHealth(attackDamage/2,map);
+        }
+    }
 }
 
-void Archer::attack(std::shared_ptr<Unit> unit) {
-    unit->decreaseHealth(attackDamage);
+void Archer::attack(Map *map) {
+    if(inMotion())
+        return;
+    //Prosty atak
+    auto unit = map->getClosestEnemy(x, y,range, owner);
+    if(unit != nullptr)
+    {
+        unit->decreaseHealth(attackDamage);
+    }
+    else
+    {
+        //Jeżeli nie ma wroga w zasięgu atakuję najbliższy wrogi budynek
+        auto building = map->getClosestEnemyBuilding(x,y,range,owner);
+        if(building != nullptr)
+        {
+            building->decreaseHealth(attackDamage/2,map);
+        }
+    }
 }
 
-void Cavalry::attack(std::shared_ptr<Unit> unit) {
-    unit->decreaseHealth(attackDamage);
+void Cavalry::attack(Map *map) {
+    //jeżeli w ruchu zadaje 50% obrażeń
+    int Dammage;
+    if(inMotion())
+        Dammage = attackDamage/2;
+    else
+        Dammage = attackDamage;
+
+    auto unit = map->getClosestEnemy(x, y,range, owner);
+    if(unit != nullptr)
+    {
+        unit->decreaseHealth(Dammage);
+    }
+    else
+    {
+        //Jeżeli nie ma wroga w zasięgu atakuję najbliższy wrogi budynek
+        auto building = map->getClosestEnemyBuilding(x,y,range,owner);
+        if(building != nullptr)
+        {
+            building->decreaseHealth(attackDamage/2,map);
+        }
+    }
+
 }
 
-void Magician::attack(std::shared_ptr<Unit> unit) {
-    unit->decreaseHealth(attackDamage);
+void Magician::attack(Map *map) {
+    if(inMotion())
+        return;
+    //Pobiera listę sojuszników i ich leczy
+    auto units = map->getUnitsInRange(x, y, range, owner);
+    for (auto unit : units) {
+        unit->increaseHealth(attackDamage);
+    }
 }
 
-void Wolf::attack(std::shared_ptr<Unit> unit) {
-    unit->decreaseHealth(attackDamage);
+void Wolf::attack(Map *map) {
+    //Może atakwać w ruchu
+    auto unit = map->getClosestEnemy(x, y,range, owner);
+    if(unit != nullptr)
+    {
+        unit->decreaseHealth(attackDamage);
+    }
+    else
+    {
+        //Jeżeli nie ma wroga w zasięgu atakuję najbliższy wrogi budynek
+        auto building = map->getClosestEnemyBuilding(x,y,range,owner);
+        if(building != nullptr)
+        {
+            building->decreaseHealth(attackDamage/2,map);
+        }
+    }
 }
 
-void HeavyKnight::attack(std::shared_ptr<Unit> unit) {
-    unit->decreaseHealth(attackDamage);
+void HeavyKnight::attack(Map *map) {
+    if(inMotion())
+        return;
+    //Ma 50% szans na podwójny atak
+    auto unit = map->getClosestEnemy(x, y,range, owner);
+    if(unit != nullptr)
+    {
+        unit->decreaseHealth(attackDamage);
+        if(rand()%2 == 0)
+            unit->decreaseHealth(attackDamage);
+    }
+    else
+    {
+        //Jeżeli nie ma wroga w zasięgu atakuję najbliższy wrogi budynek
+        auto building = map->getClosestEnemyBuilding(x,y,range,owner);
+        if(building != nullptr)
+        {
+            building->decreaseHealth(attackDamage/2,map);
+        }
+    }
 }
 
 

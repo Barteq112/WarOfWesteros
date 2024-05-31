@@ -302,7 +302,7 @@ void Map::removeUnitFromMap(int x, int y)
 }
 
 std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey) {
-    const int stepSize = 2;
+    const int stepSize = 1;
 
     std::queue<std::pair<int, int>> tilesToCheck;
     tilesToCheck.push({x, y});
