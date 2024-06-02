@@ -1,5 +1,6 @@
 #include "army.h"
 #include "map.h"
+#include "game.h"
 #include <algorithm>
 #include <vector>
 #include <iostream>
@@ -86,6 +87,28 @@ std::vector<std::pair<int, int>> AStar(Map* map, int startX, int startY, int goa
 //-----------------------------Klasa Army----------------------------------
 Army::Army() {}
 
+void Army::removeUnitFromList(int x, int y)
+{
+
+    auto unit = map->getTile(x, y)->getUnit();
+    if (unit == nullptr)
+    {
+        return;
+    }
+
+
+    for (auto it = units.begin(); it != units.end(); ++it)
+    {
+
+        if ((*it)->getX() == x && (*it)->getY() == y)
+        {
+
+            units.erase(it);
+            return;
+        }
+    }
+}
+
 
 
 //-----------------------------Klasa Unit----------------------------------
@@ -106,8 +129,11 @@ void Unit::increaseHealth(int amount) {
     }
 }
 
-void Unit::decreaseHealth(int amount) {
+void Unit::decreaseHealth(int amount, Game *game) {
     health -= amount;
+    if (health <= 0) {
+        removeUnit(game);
+    }
 }
 
 void Unit::move(Map* map) {
@@ -140,6 +166,27 @@ bool Unit::inMotion()
     return x != destX || y != destY;
 }
 
+void Unit::removeUnit(Game* game)
+{
+    switch(owner)
+    {
+        case 0:
+            game->getKingdomSouth()->getArmy().removeUnitFromList(x, y);
+            break;
+        case 1:
+            game->getKingdomNorth()->getArmy().removeUnitFromList(x, y);
+            break;
+        case 2:
+            game->getKingdomBeyondTheWall()->getArmy().removeUnitFromList(x, y);
+            break;
+    }
+
+
+    auto map = game->getMap();
+    map->getTile(x, y)->setUnit(nullptr);
+    delete this;
+
+}
 
 
 
@@ -147,7 +194,8 @@ bool Unit::inMotion()
 
 
 
-void Unit::attack(Map *map){} ;
+
+void Unit::attack(Game *game){} ;
 
 
 
@@ -171,13 +219,14 @@ HeavyKnight::HeavyKnight() : Unit(300, 50, 2, 3, 1, 6){maxHealth = health;};
 
 //Atak poszczególnych jednostek
 
-void Giant::attack(Map *map) {
+void Giant::attack(Game *game) {
+    auto map = game->getMap();
     if(inMotion())
         return;
     //Pobiera wrogie jednostki w zasięgu i zadaje im obrażenia
     auto units = map->getEnemiesInRange(x, y, range, owner);
     for (auto unit : units) {
-        unit->decreaseHealth(attackDamage);
+        unit->decreaseHealth(attackDamage,game);
     }
     if(units.empty())
     {
@@ -185,12 +234,13 @@ void Giant::attack(Map *map) {
         auto building = map->getClosestEnemyBuilding(x,y,range,owner);
         if(building != nullptr)
         {
-            building->decreaseHealth(attackDamage/2,map);
+            building->decreaseHealth(attackDamage/2,game);
         }
     }
 }
 
-void Infantry::attack(Map *map) {
+void Infantry::attack(Game *game) {
+    auto map = game->getMap();
     if(inMotion())
         return;
     //Pobiera najbliższego woga i zadaje dmg w zależności od ilości hp
@@ -199,7 +249,7 @@ void Infantry::attack(Map *map) {
     {
         int baseDamage = attackDamage/2;
         int Dammage = baseDamage + attackDamage/2*(health/maxHealth);
-        unit->decreaseHealth(Dammage);
+        unit->decreaseHealth(Dammage,game);
     }
     else
     {
@@ -207,19 +257,20 @@ void Infantry::attack(Map *map) {
         auto building = map->getClosestEnemyBuilding(x,y,range,owner);
         if(building != nullptr)
         {
-            building->decreaseHealth(attackDamage/2,map);
+            building->decreaseHealth(attackDamage/2,game);
         }
     }
 }
 
-void Archer::attack(Map *map) {
+void Archer::attack(Game *game) {
+    auto map = game->getMap();
     if(inMotion())
         return;
     //Prosty atak
     auto unit = map->getClosestEnemy(x, y,range, owner);
     if(unit != nullptr)
     {
-        unit->decreaseHealth(attackDamage);
+        unit->decreaseHealth(attackDamage,game);
     }
     else
     {
@@ -227,12 +278,13 @@ void Archer::attack(Map *map) {
         auto building = map->getClosestEnemyBuilding(x,y,range,owner);
         if(building != nullptr)
         {
-            building->decreaseHealth(attackDamage/2,map);
+            building->decreaseHealth(attackDamage/2,game);
         }
     }
 }
 
-void Cavalry::attack(Map *map) {
+void Cavalry::attack(Game *game) {
+    auto map = game->getMap();
     //jeżeli w ruchu zadaje 50% obrażeń
     int Dammage;
     if(inMotion())
@@ -243,7 +295,7 @@ void Cavalry::attack(Map *map) {
     auto unit = map->getClosestEnemy(x, y,range, owner);
     if(unit != nullptr)
     {
-        unit->decreaseHealth(Dammage);
+        unit->decreaseHealth(Dammage,game);
     }
     else
     {
@@ -251,13 +303,14 @@ void Cavalry::attack(Map *map) {
         auto building = map->getClosestEnemyBuilding(x,y,range,owner);
         if(building != nullptr)
         {
-            building->decreaseHealth(attackDamage/2,map);
+            building->decreaseHealth(attackDamage/2,game);
         }
     }
 
 }
 
-void Magician::attack(Map *map) {
+void Magician::attack(Game *game) {
+    auto map = game->getMap();
     if(inMotion())
         return;
     //Pobiera listę sojuszników i ich leczy
@@ -267,12 +320,13 @@ void Magician::attack(Map *map) {
     }
 }
 
-void Wolf::attack(Map *map) {
+void Wolf::attack(Game *game) {
+    auto map = game->getMap();
     //Może atakwać w ruchu
     auto unit = map->getClosestEnemy(x, y,range, owner);
     if(unit != nullptr)
     {
-        unit->decreaseHealth(attackDamage);
+        unit->decreaseHealth(attackDamage,game);
     }
     else
     {
@@ -280,21 +334,22 @@ void Wolf::attack(Map *map) {
         auto building = map->getClosestEnemyBuilding(x,y,range,owner);
         if(building != nullptr)
         {
-            building->decreaseHealth(attackDamage/2,map);
+            building->decreaseHealth(attackDamage/2,game);
         }
     }
 }
 
-void HeavyKnight::attack(Map *map) {
+void HeavyKnight::attack(Game *game) {
+    auto map = game->getMap();
     if(inMotion())
         return;
     //Ma 50% szans na podwójny atak
     auto unit = map->getClosestEnemy(x, y,range, owner);
     if(unit != nullptr)
     {
-        unit->decreaseHealth(attackDamage);
+        unit->decreaseHealth(attackDamage,game);
         if(rand()%2 == 0)
-            unit->decreaseHealth(attackDamage);
+            unit->decreaseHealth(attackDamage,game);
     }
     else
     {
@@ -302,7 +357,7 @@ void HeavyKnight::attack(Map *map) {
         auto building = map->getClosestEnemyBuilding(x,y,range,owner);
         if(building != nullptr)
         {
-            building->decreaseHealth(attackDamage/2,map);
+            building->decreaseHealth(attackDamage/2,game);
         }
     }
 }

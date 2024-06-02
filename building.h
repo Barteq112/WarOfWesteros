@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+
 
 //Stałe wymiary budynków
 constexpr int mainCastleSizeX = 3;
@@ -67,8 +69,8 @@ public:
     virtual ~Building() = default;
     void setX(int x){this->x = x;};
     void setY(int y){this->y = y;};
-    void removeBuilding(Map *map);              //Te 3 do zrobienia
-    void decreaseHealth(int amount,Map *map);    //
+    void removeBuilding(Game *game);      //Te 3 do zrobienia
+    void decreaseHealth(int amount,Game *game);    //
     void increaseHealth(int amount);    //
     int getSizex(){return sizex;};
     int getSizey(){return sizey;};
@@ -81,12 +83,12 @@ public:
 class MainCastle : public Building
 {
 private:
-    int level;
+    int level ;
 public:
     int getLevel(){return level;};
-    void upgradeCastle();           //To do zrobienia
-    MainCastle() : level(0) {this->type = 0;  this->sizex = mainCastleSizeX;
-        this->sizey = mainCastleSizeY; this->health = 1000;this->maxHealth = 1000;};
+    void upgradeCastle();
+    MainCastle()  {this->type = 0;  this->sizex = mainCastleSizeX;
+        this->sizey = mainCastleSizeY; this->health = 1000;this->maxHealth = 1000; this->level = 0;};
 };
 
 class Barracks : public Building

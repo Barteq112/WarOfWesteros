@@ -2,8 +2,21 @@
 #include "game.h"
 Building::Building() {}
 
-void Building::removeBuilding(Map *map)
+void Building::removeBuilding(Game *game)
 {
+    switch (owner) {
+    case 0: // South
+        game->getKingdomSouth()->removeBuildingFromList(x,y);
+        break;
+    case 1: // North
+        game->getKingdomNorth()->removeBuildingFromList(x,y);
+        break;
+    case 2: // BeyondTheWall
+        game->getKingdomBeyondTheWall()->removeBuildingFromList(x,y);
+        break;
+
+    }
+    auto map = game->getMap();
     //Usuwa budynek z mapy ze wszystkich kafelków i z listy budynków
     for (int i = 0; i < sizex; i++)
     {
@@ -13,14 +26,17 @@ void Building::removeBuilding(Map *map)
         }
     }
 
+
 }
 
-void Building::decreaseHealth(int amount, Map *map)
+
+
+void Building::decreaseHealth(int amount, Game *game)
 {
     health -= amount;
     if (health <= 0)
     {
-        removeBuilding(map);
+        removeBuilding(game);
     }
 }
 
@@ -125,4 +141,11 @@ void Barracks::RecruitUnit(int unitType, Game* game) {
     unit->setY(yy);
     unit->setDestination(xx,yy);
 
+}
+
+void MainCastle::upgradeCastle()
+{
+    level++;
+    maxHealth += 200;
+    health += 200;
 }

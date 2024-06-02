@@ -5,6 +5,7 @@
 
 Kingdom::Kingdom() : resources(10000,1000) {
     this->getArmy().setOwner(this->owner);
+    this->getArmy().setMap(this->map);
 }
 
 void Kingdom::buildMainCastle(int x, int y)
@@ -49,6 +50,24 @@ void Kingdom::buildHouse(int x, int y)
     house->setX(x);
     house->setY(y);
     house->setOwner(this->owner);
+}
+
+void Kingdom::removeBuildingFromList(int x, int y)
+{
+    auto building = map->getTile(x, y)->getBuilding();
+    if (building == nullptr)
+    {
+        return;
+    }
+
+    for (auto it = buildings.begin(); it != buildings.end(); ++it)
+    {
+        if (*it == building)
+        {
+            buildings.erase(it);
+            break;
+        }
+    }
 }
 
 int Kingdom::checkHouses()

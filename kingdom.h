@@ -29,6 +29,7 @@ public:
     void buildMainCastle(int x, int y);
     void buildBarracks(int x, int y);
     void buildHouse(int x, int y);
+    void removeBuildingFromList(int x, int y);
     //Sprawdza liczbę domów
     int checkHouses();
     //Sprawdza level zamku

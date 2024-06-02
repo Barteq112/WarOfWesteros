@@ -31,15 +31,22 @@ void Game::startGame() {
     //Podział mapy
     for(int i=0; i<map->getMapWidth(); i++) {
         for(int j=0; j<map->getMapHeight(); j++) {
-            if(i<map->getMapHeight()/3) {
+            if(j<map->getMapHeight()/3) {
                 map->getTile(i,j)->setOwner(0);
-            } else if(i<2*map->getMapHeight()/3) {
+            } else if(j<2*map->getMapHeight()/3) {
                 map->getTile(i,j)->setOwner(1);
             } else {
                 map->getTile(i,j)->setOwner(2);
             }
         }
     }
+
+    //Postawienie zamku głównego dla każdego królestwa
+    KingdomSouth->buildMainCastle(1,1);
+    KingdomNorth->buildMainCastle(map->getMapWidth()-4,map->getMapHeight()/2);
+    KingdomBeyondTheWall->buildMainCastle(1,map->getMapHeight()-5);
+
+
 
 }
 
@@ -79,7 +86,7 @@ void Game::autoMoveAttack()
 
             unit->move(this->getMap());
         }
-        unit->attack(this->getMap());
+        unit->attack(this);
 
     }
 }

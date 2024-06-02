@@ -16,6 +16,15 @@ void drawMap(Map* mapa)
 
     // Tworzenie okna SFML
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
+    // Create a view with the same size as the window
+    sf::View view = window.getDefaultView();
+
+    // Flip the y-axis by scaling it by -1 and adjusting the center
+    view.setCenter(view.getSize().x / 2, view.getSize().y / 2);
+    view.setSize(view.getSize().x, -view.getSize().y);
+    window.setView(view);
+
+
     while (window.isOpen())
     {
         // Obsługa zdarzeń
@@ -72,13 +81,16 @@ int main(int argc, char *argv[])
     game->startGame();
 
     // testowe dodanie jednostek do armii południa i wyświetlenie ich
-    game->getKingdomSouth()->buildBarracks(0, 0);
-    game->getKingdomNorth()->buildHouse(45,44);
-    auto barracks = std::dynamic_pointer_cast<Barracks>(game->getKingdomSouth()->getBuildings().at(0));
+    game->getKingdomSouth()->buildBarracks(10, 10);
+    auto barracks = std::dynamic_pointer_cast<Barracks>(game->getKingdomSouth()->getBuildings().at(1));
     barracks->RecruitUnit(1, game);
     auto unit = game->getKingdomSouth()->getArmy().getUnits().at(0);
     std::cout << unit->getHealth() << std::endl;
     auto mapa = game->getMap();
+
+
+
+
     std::thread thread1(drawMap, mapa);
     std::thread thread2(moveUnit,game);
 
