@@ -51,6 +51,7 @@ std::vector<std::pair<int, int>> AStar(Map* map, int startX, int startY, int goa
                 path.push_back(std::make_pair(node->x, node->y));
             }
             std::reverse(path.begin(), path.end());
+
             return path;
         }
 
@@ -58,28 +59,31 @@ std::vector<std::pair<int, int>> AStar(Map* map, int startX, int startY, int goa
 
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
-                if ((dx == 0 && dy == 0) || (abs(dx) == abs(dy) && !map->getTile(current.x + dx, current.y + dy)->getIsAvailable())) {
-                    continue;
-                }
-
                 int neighborX = current.x + dx;
                 int neighborY = current.y + dy;
 
-                if (neighborX >= 0 && neighborX < map->getMapWidth() && neighborY >= 0 && neighborY < map->getMapHeight() && map->getTile(neighborX, neighborY)->getIsAvailable()) {
-                    Node neighbor(neighborX, neighborY);
-                    neighbor.gScore = current.gScore + 1;
-                    neighbor.hScore = abs(neighborX - goalX) + abs(neighborY - goalY);
-                    neighbor.fScore = neighbor.gScore + neighbor.hScore;
-                    neighbor.parent = new Node(current);
+                // Sprawdzenie czy współrzędne są w granicach mapy
+                if (neighborX >= 0 && neighborX < map->getMapWidth() && neighborY >= 0 && neighborY < map->getMapHeight()) {
+                    // Jeśli współrzędne są w granicach mapy, sprawdź kafel
+                    if ((dx == 0 && dy == 0) || (abs(dx) == abs(dy) && !map->getTile(neighborX, neighborY)->getIsAvailable())) {
+                        continue;
+                    }
 
-                    if (closedSet.find(neighbor) == closedSet.end()) {
-                        openSet.push(neighbor);
+                    if (map->getTile(neighborX, neighborY)->getIsAvailable()) {
+                        Node neighbor(neighborX, neighborY);
+                        neighbor.gScore = current.gScore + 1;
+                        neighbor.hScore = abs(neighborX - goalX) + abs(neighborY - goalY);
+                        neighbor.fScore = neighbor.gScore + neighbor.hScore;
+                        neighbor.parent = new Node(current);
+
+                        if (closedSet.find(neighbor) == closedSet.end()) {
+                            openSet.push(neighbor);
+                        }
                     }
                 }
             }
         }
     }
-
     return std::vector<std::pair<int, int>>();
 }
 
@@ -120,6 +124,8 @@ Unit::Unit( int health, int attackDamage, int attackSpeed, int Range, int speed,
     this->range = Range;
     this->attackSpeed = attackSpeed;
     this->type = type;
+    this->LastAttackTime = std::chrono::system_clock::now();
+    this->LastMoveTime = std::chrono::system_clock::now();
 }
 
 void Unit::increaseHealth(int amount) {
@@ -137,16 +143,20 @@ void Unit::decreaseHealth(int amount, Game *game) {
 }
 
 void Unit::move(Map* map) {
+
     if (x == destX && y == destY) {
         return;
     }
     // sprawdzenie czy docelowe pole jest dostępne, jeśli nie to szukamy najbliższego wolnego pola
     if(map->getTile(destX, destY)->getIsAvailable() == false) {
         auto[tmpX,tmpy] = map->findClosestFreeTile(destX, destY,unitSizeX,unitSizeY);
+
         destX = tmpX;
         destY = tmpy;
     }
+
     auto path = AStar(map, x, y, destX, destY);
+
     // jeśli ścieżka jest pusta, to cel nie jest osiągalny, więc nie ruszamy jednostki
     if(path.empty()) {
         destX = x;
@@ -184,9 +194,19 @@ void Unit::removeUnit(Game* game)
 
     auto map = game->getMap();
     map->getTile(x, y)->setUnit(nullptr);
-    delete this;
 
 }
+
+void Unit::setLastAttackTime()
+{
+    LastAttackTime = std::chrono::system_clock::now();
+}
+
+void Unit::setLastMoveTime()
+{
+    LastMoveTime = std::chrono::system_clock::now();
+}
+
 
 
 
@@ -200,21 +220,21 @@ void Unit::attack(Game *game){} ;
 
 
 
-//Konstruktor jednostek, inicjalizacja wartości początkowych -- health, attackDamage, attackSpeed, Range, speed, id
+//Konstruktor jednostek, inicjalizacja wartości początkowych -- health, attackDamage, attackSpeed, Range, speed, type
 
 Giant::Giant() : Unit(300, 30, 1, 2, 1, 0){maxHealth = health;};
 
-Infantry::Infantry() : Unit(150, 30, 3, 3, 3, 1){maxHealth = health;};
+Infantry::Infantry() : Unit(150, 30, 2, 3, 3, 1){maxHealth = health;};
 
-Archer::Archer() : Unit(80, 20, 5, 9, 4, 2){maxHealth = health;};
+Archer::Archer() : Unit(80, 20, 4, 9, 4, 2){maxHealth = health;};
 
 Cavalry::Cavalry() : Unit(200, 40, 2, 5, 6, 3){maxHealth = health;};
 
-Magician::Magician() : Unit(300, 50, 2, 3, 1, 4){maxHealth = health;};
+Magician::Magician() : Unit(300, 50, 2, 3, 2, 4){maxHealth = health;};
 
-Wolf::Wolf() : Unit(300, 50, 2, 3, 1, 5){maxHealth = health;};
+Wolf::Wolf() : Unit(300, 50, 2, 3, 5, 5){maxHealth = health;};
 
-HeavyKnight::HeavyKnight() : Unit(300, 50, 2, 3, 1, 6){maxHealth = health;};
+HeavyKnight::HeavyKnight() : Unit(300, 50, 2, 3, 2, 6){maxHealth = health;};
 
 
 //Atak poszczególnych jednostek

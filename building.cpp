@@ -4,18 +4,19 @@ Building::Building() {}
 
 void Building::removeBuilding(Game *game)
 {
+    Kingdom *kingdom;
     switch (owner) {
     case 0: // South
-        game->getKingdomSouth()->removeBuildingFromList(x,y);
+        kingdom = game->getKingdomSouth();
         break;
     case 1: // North
-        game->getKingdomNorth()->removeBuildingFromList(x,y);
+        kingdom = game->getKingdomNorth();
         break;
     case 2: // BeyondTheWall
-        game->getKingdomBeyondTheWall()->removeBuildingFromList(x,y);
+        kingdom = game->getKingdomBeyondTheWall();
         break;
-
     }
+    kingdom->removeBuildingFromList(x,y);
     auto map = game->getMap();
     //Usuwa budynek z mapy ze wszystkich kafelków i z listy budynków
     for (int i = 0; i < sizex; i++)
@@ -26,7 +27,6 @@ void Building::removeBuilding(Game *game)
         }
     }
 
-
 }
 
 
@@ -34,8 +34,58 @@ void Building::removeBuilding(Game *game)
 void Building::decreaseHealth(int amount, Game *game)
 {
     health -= amount;
-    if (health <= 0)
+    if (health <= 0 && type == 0)
     {
+        Kingdom *kingdom;
+        switch (owner) {
+        case 0: // South
+            kingdom = game->getKingdomSouth();
+            //game->setKingdomSouth(nullptr);
+            break;
+        case 1: // North
+            kingdom = game->getKingdomNorth();
+            //game->setKingdomNorth(nullptr);
+            break;
+        case 2: // BeyondTheWall
+            kingdom = game->getKingdomBeyondTheWall();
+            //game->setKingdomBeyondTheWall(nullptr);
+            break;
+        }
+
+        //Usuwa wszystkie jednostki i budynki z królestwa
+        for(auto building : kingdom->getBuildings())
+        {
+
+                building->removeBuilding(game);
+        }
+        for(auto unit : kingdom->getArmy().getUnits())
+        {
+            unit->removeUnit(game);
+        }
+
+        delete kingdom;
+
+
+        switch (owner) {
+        case 0: // South
+            game->setKingdomSouth(nullptr);
+            break;
+        case 1: // North
+            game->setKingdomNorth(nullptr);
+            break;
+        case 2: // BeyondTheWall
+            game->setKingdomBeyondTheWall(nullptr);
+            break;
+        }
+        if(game->isGameEnded())
+        {
+
+            game->endGame();
+        }
+    }
+    else if (health <= 0)
+    {
+
         removeBuilding(game);
     }
 }
@@ -88,7 +138,7 @@ void Barracks::RecruitUnit(int unitType, Game* game) {
 
         return;
     }
-
+    //std::cout<<"test";
     Map* map = game->getMap();
     std::shared_ptr<Unit> unit = nullptr;
     switch(unitType)

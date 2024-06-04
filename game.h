@@ -19,7 +19,11 @@ public:
     Game();
     void startGame();
     void endGame();
+    bool isGameEnded();
     void autoMoveAttack();
+    void setKingdomNorth(Kingdom* kingdom) {KingdomNorth = kingdom;}
+    void setKingdomSouth(Kingdom* kingdom) {KingdomSouth = kingdom;}
+    void setKingdomBeyondTheWall(Kingdom* kingdom) {KingdomBeyondTheWall = kingdom;}
     Map* getMap() {return map;}
     Kingdom* getKingdomNorth() {return KingdomNorth;}
     Kingdom* getKingdomSouth() {return KingdomSouth;}

@@ -317,6 +317,7 @@ std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey)
         tilesToCheck.pop();
 
         if (placeIsAvailable(currentX, currentY, sizex, sizey)) {
+            //std::cout<<std::endl<<currentX<<" "<<currentY<<std::endl;
             return {currentX, currentY};
         }
 
@@ -324,9 +325,13 @@ std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey)
             int newX = currentX + dir[0];
             int newY = currentY + dir[1];
 
+            // Sprawdzamy, czy nowe współrzędne są w granicach mapy
             if (newX >= 0 && newY >= 0 && newX < getMapWidth() && newY < getMapHeight() && !visited[newX][newY]) {
-                tilesToCheck.push({newX, newY});
-                visited[newX][newY] = true;
+                // Sprawdzamy, czy cały obszar (sizex x sizey) mieści się w granicach mapy
+                if (newX + sizex <= getMapWidth() && newY + sizey <= getMapHeight()) {
+                    tilesToCheck.push({newX, newY});
+                    visited[newX][newY] = true;
+                }
             }
         }
     }

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <chrono>
 // Stale wymiary jednostki
 
 constexpr int unitSizeX =1;
@@ -29,6 +30,8 @@ protected:
     int attackSpeed;
     int type; //--typy jednostek--- 0 - Giant, 1 - Infantry, 2 - Archer, 3 - Cavalry, 4 - Magician, 5 - Wolf, 6 - HeavyKnight
     int owner; // 0 - South, 1 - North, 2 - BeyondTheWall
+    std::chrono::time_point<std::chrono::system_clock> LastAttackTime;
+    std::chrono::time_point<std::chrono::system_clock> LastMoveTime;
 
 public:
     Unit();
@@ -40,6 +43,10 @@ public:
     int getY() { return y; }
     int getDestX() { return destX; }
     int getDestY() { return destY; }
+    std::chrono::time_point<std::chrono::system_clock> getLastAttackTime() { return LastAttackTime; }
+    std::chrono::time_point<std::chrono::system_clock> getLastMoveTime() { return LastMoveTime; }
+    int getSpeed() { return speed; }
+    int getAttackSpeed() { return attackSpeed; }
     virtual void attack(Game *game);
     void setX (int x) { this->x = x; }
     void setY (int y) { this->y = y; }
@@ -48,6 +55,8 @@ public:
     void move(Map* mapa);
     bool inMotion();
     void removeUnit(Game *game);
+    void setLastAttackTime();
+    void setLastMoveTime();
     void setDestination(int x, int y)
     {
         this->destX = x;

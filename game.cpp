@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <ostream>
+#include <chrono>
 
 Game::Game() {
     //inicjalizacja królestw
@@ -22,7 +23,20 @@ void Game::endGame() {
     delete KingdomNorth;
     delete KingdomSouth;
     delete KingdomBeyondTheWall;
-    delete map;
+}
+
+bool Game::isGameEnded()
+{
+    int c=0;
+    if(KingdomBeyondTheWall == nullptr)
+        c++;
+    if(KingdomNorth == nullptr)
+        c++;
+    if(KingdomSouth == nullptr)
+        c++;
+    if(c>=2)
+        return true;
+    return false;
 }
 
 
@@ -57,22 +71,31 @@ void Game::autoMoveAttack()
     std::vector<std::shared_ptr<Unit>> allUnits;
 
     // Sprawdzenie, czy królestwa mają jednostki, zanim je dodamy do allUnits
-    auto southUnits = getKingdomSouth()->getArmy().getUnits();
-    if (!southUnits.empty()) {
-        allUnits.insert(allUnits.end(), southUnits.begin(), southUnits.end());
+    if(this->KingdomSouth != nullptr)
+    {
+        auto southUnits = getKingdomSouth()->getArmy().getUnits();
+        if (!southUnits.empty()) {
+            allUnits.insert(allUnits.end(), southUnits.begin(), southUnits.end());
+        }
     }
 
-    auto beyondTheWallUnits = getKingdomBeyondTheWall()->getArmy().getUnits();
-    if (!beyondTheWallUnits.empty()) {
-        allUnits.insert(allUnits.end(), beyondTheWallUnits.begin(), beyondTheWallUnits.end());
+    if(this->KingdomBeyondTheWall != nullptr)
+    {
+        auto beyondTheWallUnits = getKingdomBeyondTheWall()->getArmy().getUnits();
+        if (!beyondTheWallUnits.empty()) {
+            allUnits.insert(allUnits.end(), beyondTheWallUnits.begin(), beyondTheWallUnits.end());
+        }
+    }
+    if(this->KingdomNorth != nullptr)
+    {
+        auto northUnits = getKingdomNorth()->getArmy().getUnits();
+        if (!northUnits.empty()) {
+            allUnits.insert(allUnits.end(), northUnits.begin(), northUnits.end());
+        }
     }
 
-    auto northUnits = getKingdomNorth()->getArmy().getUnits();
-    if (!northUnits.empty()) {
-        allUnits.insert(allUnits.end(), northUnits.begin(), northUnits.end());
-    }
-
-
+    // Pobierz czas początkowy
+    auto currentTime = std::chrono::system_clock::now();
 
     // Przemieszaj jednostki
     if(allUnits.size() > 1)
@@ -80,13 +103,18 @@ void Game::autoMoveAttack()
     // Przejdź po liście i wykonaj ruch każdej jednostki
     for (auto unit : allUnits)
     {
-        // Jeśli jednostka nie jest w ruchu to wybierz losowy kierunek
-        if (unit->inMotion())
-        {
 
+        if (unit->inMotion() && std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - unit->getLastMoveTime()).count() >3000/unit->getSpeed())
+        {
             unit->move(this->getMap());
+            unit->setLastMoveTime();
         }
-        unit->attack(this);
+
+        if(std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - unit->getLastAttackTime()).count() >2000/unit->getAttackSpeed())
+        {
+            unit->attack(this);
+            unit->setLastAttackTime();
+        }
 
     }
 }

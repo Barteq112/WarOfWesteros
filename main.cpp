@@ -7,8 +7,9 @@
 #include <thread>
 
 const int TILE_SIZE = 10; // Rozmiar jednej płytki w pikselach
-void drawMap(Map* mapa)
+void drawMap(Game *game)
 {
+    auto mapa = game->getMap();
     // Obliczenie rozmiarów okna na podstawie rozmiaru mapy
 
     int windowWidth = mapa->getMapWidth() * TILE_SIZE;
@@ -25,7 +26,7 @@ void drawMap(Map* mapa)
     window.setView(view);
 
 
-    while (window.isOpen())
+    while (window.isOpen() && !game->isGameEnded())
     {
         // Obsługa zdarzeń
         sf::Event event;
@@ -60,14 +61,14 @@ void drawMap(Map* mapa)
         }
         window.display();
     }
+
 }
 
 void moveUnit(Game* game)
 {
-    while (true)
+    while (game->isGameEnded() == false)
     {
         game->autoMoveAttack();
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 }
 
@@ -83,24 +84,24 @@ int main(int argc, char *argv[])
     // testowe dodanie jednostek do armii południa i wyświetlenie ich
     game->getKingdomSouth()->buildBarracks(10, 10);
     auto barracks = std::dynamic_pointer_cast<Barracks>(game->getKingdomSouth()->getBuildings().at(1));
-    barracks->RecruitUnit(1, game);
+    barracks->RecruitUnit(3, game);
     auto unit = game->getKingdomSouth()->getArmy().getUnits().at(0);
-    std::cout << unit->getHealth() << std::endl;
-    auto mapa = game->getMap();
 
 
 
 
-    std::thread thread1(drawMap, mapa);
+
+    std::thread thread1(drawMap, game);
     std::thread thread2(moveUnit,game);
 
-    while (true)
+    while (game->isGameEnded() == false)
+
     {
         //Podajesz współrzędne i zmienia się kierunek
         int x, y;
         std::cout<<"Podaj x: ";
         std::cin >> x;
-        std::cout<<"\nPodaj y: ";
+        std::cout<<"Podaj y: ";
         std::cin>> y;
         unit->setDestination(x,y);
     }
