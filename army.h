@@ -43,6 +43,7 @@ public:
     int getY() { return y; }
     int getDestX() { return destX; }
     int getDestY() { return destY; }
+    int getType() { return type; }
     std::chrono::time_point<std::chrono::system_clock> getLastAttackTime() { return LastAttackTime; }
     std::chrono::time_point<std::chrono::system_clock> getLastMoveTime() { return LastMoveTime; }
     int getSpeed() { return speed; }

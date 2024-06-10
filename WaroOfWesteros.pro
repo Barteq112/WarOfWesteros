@@ -17,7 +17,6 @@ SOURCES += \
     game.cpp \
     kingdom.cpp \
     main.cpp \
-    mainwindow.cpp \
     map.cpp \
     resources.cpp
 
@@ -26,12 +25,10 @@ HEADERS += \
     building.h \
     game.h \
     kingdom.h \
-    mainwindow.h \
     map.h \
     resources.h
 
-FORMS += \
-    mainwindow.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -56,4 +53,14 @@ win32 {
     COPIES += copy_dlls
     copy_dlls.files = $$files($$DLL_DIR/*.dll)
     copy_dlls.path = $$DEST_DIR
+}
+
+# Kopiowanie folderu sprites
+win32 {
+    SPRITES_DIR = $$PWD/sprites
+    DEST_SPRITES_DIR = $$OUT_PWD/sprites
+
+    COPIES += copy_sprites
+    copy_sprites.files = $$files($$SPRITES_DIR/*)
+    copy_sprites.path = $$DEST_SPRITES_DIR
 }

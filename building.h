@@ -7,7 +7,7 @@
 
 
 //Stałe wymiary budynków
-constexpr int mainCastleSizeX = 3;
+constexpr int mainCastleSizeX = 4;
 constexpr int mainCastleSizeY = 4;
 constexpr int barracksSizeX = 3;
 constexpr int barracksSizeY = 3;
@@ -74,6 +74,8 @@ public:
     void increaseHealth(int amount);    //
     int getSizex(){return sizex;};
     int getSizey(){return sizey;};
+    int getX(){return x;};
+    int getY(){return y;};
     int getOwner(){return owner;};
     void setOwner(int owner){this->owner = owner;};
     int getHealth(){return health;};

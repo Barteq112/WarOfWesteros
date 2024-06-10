@@ -28,6 +28,7 @@ public:
     Kingdom* getKingdomNorth() {return KingdomNorth;}
     Kingdom* getKingdomSouth() {return KingdomSouth;}
     Kingdom* getKingdomBeyondTheWall() {return KingdomBeyondTheWall;}
+    void drawMap();
 };
 
 #endif // GAME_H

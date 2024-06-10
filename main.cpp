@@ -1,69 +1,14 @@
-#include "mainwindow.h"
 #include "game.h"
 #include "map.h"
-#include <QApplication>
-#include <QWidget>
-#include <QMainWindow>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <thread>
 
-const int TILE_SIZE = 10; // Rozmiar jednej płytki w pikselach
+
 void drawMap(Game *game)
 {
-    auto mapa = game->getMap();
-    // Obliczenie rozmiarów okna na podstawie rozmiaru mapy
 
-    int windowWidth = mapa->getMapWidth() * TILE_SIZE;
-    int windowHeight = mapa->getMapHeight() * TILE_SIZE;
-
-    // Tworzenie okna SFML
-    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML works!");
-    // Create a view with the same size as the window
-    sf::View view = window.getDefaultView();
-
-    // Flip the y-axis by scaling it by -1 and adjusting the center
-    view.setCenter(view.getSize().x / 2, view.getSize().y / 2);
-    view.setSize(view.getSize().x, -view.getSize().y);
-    window.setView(view);
-
-
-    while (window.isOpen() && !game->isGameEnded())
-    {
-        // Obsługa zdarzeń
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-
-        // Czyszczenie okna przed rysowaniem
-        window.clear();
-
-        for (int i = 0; i < mapa->getMapWidth(); i++)
-        {
-            for (int j = 0; j < mapa->getMapHeight(); j++)
-            {
-                if (mapa->getTile(i, j)->getBuilding() != nullptr)
-                {
-                    sf::RectangleShape rectangle(sf::Vector2f(TILE_SIZE, TILE_SIZE));
-                    rectangle.setPosition(i * TILE_SIZE, j * TILE_SIZE);
-                    rectangle.setFillColor(sf::Color::Green);
-                    window.draw(rectangle);
-                }
-                if (mapa->getTile(i, j)->getUnit() != nullptr)
-                {
-                    sf::RectangleShape rectangle(sf::Vector2f(TILE_SIZE, TILE_SIZE));
-                    rectangle.setPosition(i * TILE_SIZE, j * TILE_SIZE);
-                    rectangle.setFillColor(sf::Color::Red);
-                    window.draw(rectangle);
-                }
-            }
-        }
-        window.display();
-    }
-
+    game->drawMap();
 }
 
 void moveUnit(Game* game)
@@ -74,12 +19,9 @@ void moveUnit(Game* game)
     }
 }
 
-int main(int argc, char *argv[])
+int main()
 {
-    // QApplication a(argc, argv);
-    // MainWindow w;
-    // w.show();
-    // return a.exec();
+
     Game* game = new Game();
     game->startGame();
 
