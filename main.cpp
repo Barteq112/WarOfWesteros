@@ -2,6 +2,8 @@
 #include "game.h"
 #include "map.h"
 #include <QApplication>
+#include <QWidget>
+#include <QMainWindow>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <thread>

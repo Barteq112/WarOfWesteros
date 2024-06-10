@@ -87,6 +87,20 @@ void Building::decreaseHealth(int amount, Game *game)
     {
 
         removeBuilding(game);
+        if(type == 2)
+        {
+            switch (owner) {
+            case 0: // South
+                game->getKingdomSouth()->getResources().decreasePopulation(5);
+                break;
+            case 1: // North
+                game->getKingdomNorth()->getResources().decreasePopulation(5);
+                break;
+            case 2: // BeyondTheWall
+                game->getKingdomBeyondTheWall()->getResources().decreasePopulation(5);
+                break;
+            }
+        }
     }
 }
 
@@ -176,6 +190,11 @@ void Barracks::RecruitUnit(int unitType, Game* game) {
         }
     }
     if (kingdom->getResources().getGold() < price) {
+        return;
+    }
+    //Sprawdzenie populacji
+    if(kingdom->getResources().getPopulation() <= 0)
+    {
         return;
     }
     auto[xx,yy] = map->findClosestFreeTile(x+int(barracksSizeX/2),y+int(barracksSizeY/2),unitSizeX,unitSizeY);

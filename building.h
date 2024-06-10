@@ -107,12 +107,13 @@ public:
 class House : public Building
 {
     private:
-        int HousePopulation;
+        int HousePopulation = 5;
     public:
         House(){this->type = 2; this->sizex = houseSizeX; this->sizey = houseSizeY;
             this->health = 500; this->maxHealth = 500;this->HousePopulation = 10;};
         //Usuwa populacje z królestwa po zniszczeniu domu
         void DeletePopulation(int amount);
+        int getHousePopulation(){return HousePopulation;};
 
 };
 

@@ -1,7 +1,6 @@
 #include "game.h"
 #include <algorithm>
 #include <iostream>
-#include <ostream>
 #include <chrono>
 
 Game::Game() {
@@ -103,6 +102,12 @@ void Game::autoMoveAttack()
     // Przejdź po liście i wykonaj ruch każdej jednostki
     for (auto unit : allUnits)
     {
+        //Sprawdzenie czy jednostka jest w danym miejscu na mapie
+        if (this->getMap()->getTile(unit->getX(),unit->getY())->getUnit() != unit)
+        {
+            continue;
+        }
+
 
         if (unit->inMotion() && std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - unit->getLastMoveTime()).count() >3000/unit->getSpeed())
         {
@@ -118,5 +123,7 @@ void Game::autoMoveAttack()
 
     }
 }
+
+
 
 

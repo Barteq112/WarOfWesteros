@@ -3,7 +3,7 @@
 #include "building.h"
 #include <iostream>
 
-Kingdom::Kingdom() : resources(10000,1000) {
+Kingdom::Kingdom() : resources(10000,10) {
     this->getArmy().setOwner(this->owner);
     this->getArmy().setMap(this->map);
 }
@@ -50,6 +50,9 @@ void Kingdom::buildHouse(int x, int y)
     house->setX(x);
     house->setY(y);
     house->setOwner(this->owner);
+    //Dodaj populacje
+    resources.increasePopulation(house->getHousePopulation());
+
 }
 
 void Kingdom::removeBuildingFromList(int x, int y)
