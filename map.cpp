@@ -74,16 +74,7 @@ void Map_tile::removeUnit()
 // --------------------Kalsa Map ------------------------------------
 
 
-Map::Map(int size_x, int size_y)
-{
-    this->size_x = size_x;
-    this->size_y = size_y;
-    map.resize(size_x);
-    for(int i = 0; i < size_x; i++)
-    {
-        map[i].resize(size_y);
-    }
-}
+
 
 int Map::getMapWidth()
 {
@@ -338,6 +329,63 @@ std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey)
     return {-1, -1};
 }
 
+std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey, int owner)
+{
+    const int stepSize = 1;
+
+    std::queue<std::pair<int, int>> tilesToCheck;
+    tilesToCheck.push({x, y});
+
+    std::vector<std::vector<bool>> visited(getMapWidth(), std::vector<bool>(getMapHeight(), false));
+    visited[x][y] = true;
+
+    int directions[4][2] = {{stepSize, 0}, {0, stepSize}, {-stepSize, 0}, {0, -stepSize}};
+
+    while (!tilesToCheck.empty()) {
+        auto [currentX, currentY] = tilesToCheck.front();
+        tilesToCheck.pop();
+
+        bool allTilesBelongToOwner = true;
+
+        // Sprawdzamy, czy wszystkie kafelki pod budynkiem należą do właściciela
+        for (int i = 0; i < sizex; ++i) {
+            for (int j = 0; j < sizey; ++j) {
+                //Sprawdza czy się mieści w granicach mapy
+                if (currentX + i >= getMapWidth() || currentY + j >= getMapHeight()) {
+                    allTilesBelongToOwner = false;
+                    break;
+                }
+                if (getTile(currentX + i, currentY + j)->getOwner() != owner) {
+                    allTilesBelongToOwner = false;
+                    break;
+                }
+            }
+            if (!allTilesBelongToOwner) break;
+        }
+
+        // Jeśli wszystkie kafelki należą do właściciela i miejsce jest dostępne, zwracamy współrzędne
+        if (allTilesBelongToOwner && placeIsAvailable(currentX, currentY, sizex, sizey)) {
+            return {currentX, currentY};
+        }
+
+        // Dodajemy sąsiednie kafelki do sprawdzenia
+        for (auto& dir : directions) {
+            int newX = currentX + dir[0];
+            int newY = currentY + dir[1];
+
+            // Sprawdzamy, czy nowe współrzędne są w granicach mapy
+            if (newX >= 0 && newY >= 0 && newX < getMapWidth() && newY < getMapHeight() && !visited[newX][newY]) {
+                // Sprawdzamy, czy cały obszar (sizex x sizey) mieści się w granicach mapy
+                if (newX + sizex <= getMapWidth() && newY + sizey <= getMapHeight()) {
+                    tilesToCheck.push({newX, newY});
+                    visited[newX][newY] = true;
+                }
+            }
+        }
+    }
+    return {-1, -1};
+}
+
 std::vector<std::vector<bool> > Map::getAvailableTiles()
 {
     std::vector<std::vector<bool>> availableTiles(size_x, std::vector<bool>(size_y, false));
@@ -349,6 +397,28 @@ std::vector<std::vector<bool> > Map::getAvailableTiles()
         }
     }
     return availableTiles;
+}
+
+std::pair<int, int> Map::checkCoordinates(int x, int y)
+{
+    //sprawdzenie czy współrzędne są w granicach mapy
+    if(x < 0)
+    {
+        x = 0;
+    }
+    if(y < 0)
+    {
+        y = 0;
+    }
+    if(x >= size_x)
+    {
+        x = size_x-1;
+    }
+    if(y >= size_y)
+    {
+        y = size_y-1;
+    }
+    return std::make_pair(x,y);
 }
 
 

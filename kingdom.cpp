@@ -2,6 +2,8 @@
 #include "map.h"
 #include "building.h"
 #include <iostream>
+#include <chrono>
+#include "game.h"
 
 Kingdom::Kingdom() : resources(10000,10) {
     this->getArmy().setOwner(this->owner);
@@ -99,6 +101,48 @@ int Kingdom::checkCastleLevel()
         }
     }
     return 0;
+}
+
+void Kingdom::autoRun(Game *game)
+{
+    // Uruchamia zegar
+    auto last = std::chrono::high_resolution_clock::now();
+    //stawia barki w losowym miejscu w odległości 8 od zamku
+    auto[x,y]= map->findClosestFreeTile(getBuildings().at(0)->getX(), getBuildings().at(0)->getY(),mainCastleSizeX,mainCastleSizeY);
+        buildBarracks(x,y);
+    auto mainCastle = std::dynamic_pointer_cast<MainCastle>(getBuildings().at(0));
+    auto barracks = std::dynamic_pointer_cast<Barracks>(getBuildings().at(1));
+    //stawia dom w losowym miejscu w odległości 8 od zamku
+    int x1 = mainCastle->getX();
+    int y1 = mainCastle->getY();
+    x1 = x1 + (rand() % 16 - 8);
+    y1 = y1 + (rand() % 16 - 8);
+    auto[x11,y11] = map->checkCoordinates(x1,y1);
+    std::cout<<"x1: "<<x11<<" y1: "<<y11<<std::endl;
+    auto[x2,y2]= map->findClosestFreeTile(x11, y11,houseSizeX,houseSizeY,owner);
+    std::cout<<"x2: "<<x2<<" y2: "<<y2<<std::endl;
+    buildHouse(x2,y2);
+    while(0)
+    {
+        if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now()-last).count() >= 20)
+        {
+            //jeżli brak populacji stawia dom
+            if(resources.getPopulation() == 0)
+            {
+                auto[x,y]= map->findClosestFreeTile(mainCastle->getX(), mainCastle->getY(),houseSizeX,houseSizeY,owner);
+                buildHouse(x,y);
+            }
+            //co 20 sekund dodaje jednostki do armii
+            barracks->RecruitUnit(1, game);
+            last = std::chrono::high_resolution_clock::now();
+        }
+        {
+
+        }
+    }
+
+
+
 }
 
 

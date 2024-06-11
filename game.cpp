@@ -270,7 +270,7 @@ void Game::drawMap()
             sprite.setPosition(unit->getX() * TILE_SIZE, unit->getY() * TILE_SIZE);
             sprite.setScale(TILE_SIZE / (float)unitTexture.getSize().x, TILE_SIZE / (float)unitTexture.getSize().y);
 
-            //sprite.setRotation(180); // Obrót o 180 stopni
+
             window.draw(sprite);
         }
 
@@ -316,6 +316,8 @@ void Game::drawMap()
         window.display();
     }
 }
+
+
 
 
 

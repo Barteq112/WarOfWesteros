@@ -36,6 +36,7 @@ public:
     int checkCastleLevel();
     void setOwner(int owner) {this->owner = owner;}
     void setMap(Map* map) {this->map = map;}
+    void autoRun(Game *game);
 };
 
 #endif // KINGDOM_H

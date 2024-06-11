@@ -53,7 +53,17 @@ private:
     int size_x, size_y;
 public:
     //tworzy mape o podanym rozmiarze
-    Map(int size_x, int size_y);
+    Map(int size_x, int size_y)
+    {
+        this->size_x = size_x;
+        this->size_y = size_y;
+        map.resize(size_x);
+        for(int i = 0; i < size_x; i++)
+        {
+            map[i].resize(size_y);
+        }
+        this->size_x = size_x-1;
+    }
     //zwraca szerokość mapy
     int getMapWidth();
     //zwraca wysokość mapy
@@ -84,8 +94,12 @@ public:
     void removeUnitFromMap(int x, int y);
     //Znajduję najbliższe wolne miejsce od podanych współrzędnych i podanego rozmiaru
     std::pair<int,int> findClosestFreeTile(int x, int y, int sizex, int sizey);
+    //Znajduję najbliższe wolne miejsce od podanych współrzędnych i podanego rozmiaru oraz należące do podanego właściciela
+    std::pair<int, int> findClosestFreeTile(int x, int y, int sizex, int sizey, int owner);
     //Zwraca mape dostępnych kafelków
     std::vector<std::vector<bool>> getAvailableTiles();
+    //sprawdza czy czy współrzędne są w obrębie mapy jeżeli nie to zwraca najbliższe wzpółrzędne w obębie mapy
+    std::pair<int,int> checkCoordinates(int x, int y);
 
 
 
