@@ -28,7 +28,7 @@ int main()
 
     game->getKingdomSouth()->autoRun(game);
     game->getKingdomNorth()->autoRun(game);
-
+    game->getKingdomBeyondTheWall()->autoRun(game);
     std::thread thread1(drawMap, game);
     std::thread thread2(moveUnit,game);
 

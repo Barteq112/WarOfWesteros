@@ -106,6 +106,19 @@ int Kingdom::checkCastleLevel()
     return 0;
 }
 
+
+void Kingdom::grantGold()
+{
+    //std::cout << "Granting gold to kingdom " << name << std::endl;
+    auto mainCastle = std::dynamic_pointer_cast<MainCastle>(getBuildings().at(0));
+    int castleLevel = mainCastle->getLevel();    // Zakładając, że MainCastle ma funkcję getLevel()
+    int numBuildings = getBuildings().size();
+    int goldToAdd = std::min(300, castleLevel * 100 + numBuildings * 100);
+
+    resources.increaseGold(goldToAdd); // Zakładając, że Resources ma funkcję addGold()
+}
+
+
 void Kingdom::autoRun(Game *game)
 {
     // Uruchamia zegar
@@ -115,7 +128,7 @@ void Kingdom::autoRun(Game *game)
 
     // Stawia baraki w losowym miejscu w odległości 8 od zamku po 10 sekundach
     std::thread([this, game, lastRecruitTime, lastAttackTime]() mutable {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(std::rand() % 1000 + 1000));
         auto [x, y] = map->findClosestFreeTile(getBuildings().at(0)->getX(), getBuildings().at(0)->getY(), mainCastleSizeX, mainCastleSizeY);
 
         buildBarracks(x, y);
@@ -123,6 +136,7 @@ void Kingdom::autoRun(Game *game)
         auto mainCastle = std::dynamic_pointer_cast<MainCastle>(getBuildings().at(0));
         auto barracks = std::dynamic_pointer_cast<Barracks>(map->getTile(x, y)->getBuilding());
 
+        std::srand(static_cast<unsigned>(std::time(nullptr)) + std::hash<std::thread::id>{}(std::this_thread::get_id()));
         while (true)
         {
             auto now = std::chrono::high_resolution_clock::now();
@@ -131,9 +145,11 @@ void Kingdom::autoRun(Game *game)
             int recruitTime = 2 + std::rand() % 2;  // Losuje liczbę z zakresu 2-3
             int attackTime = 9 + std::rand() % 4;   // Losuje liczbę z zakresu 9-12
 
-            // Sprawdza czy czas na rekrutację jednostek
+
+            //std::cout<<owner<<"  "<<getResources().getGold()<<" d"<<std::endl;
             if (std::chrono::duration_cast<std::chrono::seconds>(now - lastRecruitTime).count() >= recruitTime && getResources().getGold() > 200)
             {
+
                 if (resources.getPopulation() <= 0)
                 {
                     auto [hx, hy] = map->findClosestFreeTile(mainCastle->getX(), mainCastle->getY(), houseSizeX, houseSizeY, owner);
@@ -142,6 +158,11 @@ void Kingdom::autoRun(Game *game)
                 }
                 else
                 {
+                    if(barracks==nullptr)
+                    {
+                        std::cout<<"Barracks not found";
+                        return;
+                    }
                     auto availableUnits = southUnitPrices;
                     int random = std::rand() % 5;
 

@@ -96,9 +96,9 @@ Army::Army() {}
 
 void Army::removeUnitFromList(int x, int y)
 {
-    std::cout << "x "<<x<<"y"<<y<< std::endl;
+    //std::cout << "x "<<x<<"y"<<y<< std::endl;
     //auto unit = map->getTile(x, y)->getUnit();
-    std::cout << "Usunięto jednostkę z listy jednostek" << std::endl;
+    //std::cout << "Usunięto jednostkę z listy jednostek" << std::endl;
     // if (unit == nullptr)
     // {
     //     return;
@@ -293,7 +293,6 @@ void Archer::attack(Game *game) {
     auto unit = map->getClosestEnemy(x, y,range, owner);
     if(unit != nullptr)
     {
-        std::cout<<"attack"<<std::endl;
         unit->decreaseHealth(attackDamage,game);
     }
     else

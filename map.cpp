@@ -91,7 +91,9 @@ Map_tile* Map::getTile(int x, int y)
     //Sprawszenie czy w obrębi mapy
     if (x < 0 || x >= size_x || y < 0 || y >= size_y)
     {
+        std::cout<<x<<" "<<y<<std::endl;
         std::cout<<"Error: getTile out of range\n";
+        return nullptr;
     }
     return &map[x][y];
 }
@@ -160,9 +162,9 @@ std::shared_ptr<Unit> Map::getClosestEnemy(int x, int y, int range, int owner)
     double minDistance = std::numeric_limits<double>::max();
     x = int(floor(x+0.5*unitSizeX));
     y = int(floor(y+0.5*unitSizeY));
-    for (int i = std::max(0, x - range); i <= std::min(size_x - 1, x + range); ++i)
+    for (int i = std::max(0, x - range); i <= std::min(size_x-1, x + range); ++i)
     {
-        for (int j = std::max(0, y - range); j <= std::min(size_y - 1, y + range); ++j)
+        for (int j = std::max(0, y - range); j <= std::min(size_y-1, y + range); ++j)
         {
             std::shared_ptr<Unit> unit = getTile(i, j)->getUnit();
             if (unit != nullptr && unit->getOwner() != owner)
@@ -289,7 +291,7 @@ void Map::setUnitOnMap(int x, int y, std::shared_ptr<Unit> unit)
 
 void Map::removeUnitFromMap(int x, int y)
 {
-    //standardowy rozmiar jednostki to 3x3
+
 
     for(int i = x; i < x + unitSizeX; i++)
     {
@@ -313,6 +315,7 @@ std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey)
 
     while (!tilesToCheck.empty()) {
         auto [currentX, currentY] = tilesToCheck.front();
+
         tilesToCheck.pop();
 
         if (placeIsAvailable(currentX, currentY, sizex, sizey)) {

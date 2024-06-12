@@ -69,62 +69,77 @@ void Game::startGame() {
 
 void Game::autoMoveAttack()
 {
-
     std::vector<std::shared_ptr<Unit>> allUnits;
 
     // Sprawdzenie, czy królestwa mają jednostki, zanim je dodamy do allUnits
-    if(this->KingdomSouth != nullptr)
+    if (this->KingdomSouth != nullptr)
     {
         auto southUnits = getKingdomSouth()->getArmy().getUnits();
-        if (!southUnits.empty()) {
+        if (!southUnits.empty())
+        {
             allUnits.insert(allUnits.end(), southUnits.begin(), southUnits.end());
         }
     }
 
-    if(this->KingdomBeyondTheWall != nullptr)
+    if (this->KingdomBeyondTheWall != nullptr)
     {
         auto beyondTheWallUnits = getKingdomBeyondTheWall()->getArmy().getUnits();
-        if (!beyondTheWallUnits.empty()) {
+        if (!beyondTheWallUnits.empty())
+        {
             allUnits.insert(allUnits.end(), beyondTheWallUnits.begin(), beyondTheWallUnits.end());
         }
     }
-    if(this->KingdomNorth != nullptr)
+
+    if (this->KingdomNorth != nullptr)
     {
         auto northUnits = getKingdomNorth()->getArmy().getUnits();
-        if (!northUnits.empty()) {
+        if (!northUnits.empty())
+        {
             allUnits.insert(allUnits.end(), northUnits.begin(), northUnits.end());
         }
     }
 
     // Pobierz czas początkowy
     auto currentTime = std::chrono::system_clock::now();
-    if(allUnits.empty())
+    static auto lastGoldGrantTime = currentTime;
+
+    // Sprawdź, czy minęło 60 sekund od ostatniego przyznania złota
+    if (std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastGoldGrantTime).count() >= 20)
+    {
+        if (this->KingdomSouth != nullptr) this->KingdomSouth->grantGold();
+        if (this->KingdomNorth != nullptr) this->KingdomNorth->grantGold();
+        if (this->KingdomBeyondTheWall != nullptr) this->KingdomBeyondTheWall->grantGold();
+
+        lastGoldGrantTime = currentTime;
+    }
+
+    if (allUnits.empty())
         return;
+
     // Przemieszaj jednostki
-    if(allUnits.size() > 1)
+    if (allUnits.size() > 1)
         std::random_shuffle(allUnits.begin(), allUnits.end());
+
     // Przejdź po liście i wykonaj ruch każdej jednostki
     for (auto unit : allUnits)
     {
-        //Sprawdzenie czy jednostka jest w danym miejscu na mapie
-        if (this->getMap()->getTile(unit->getX(),unit->getY())->getUnit() != unit)
+        // Sprawdzenie czy jednostka jest w danym miejscu na mapie
+        if (this->getMap()->getTile(unit->getX(), unit->getY())->getUnit() != unit)
         {
             continue;
         }
 
-
-        if (unit->inMotion() && std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - unit->getLastMoveTime()).count() >3000/unit->getSpeed())
+        if (unit->inMotion() && std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - unit->getLastMoveTime()).count() > 3000 / unit->getSpeed())
         {
             unit->move(this->getMap());
             unit->setLastMoveTime();
         }
 
-        if(std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - unit->getLastAttackTime()).count() >2000/unit->getAttackSpeed())
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - unit->getLastAttackTime()).count() > 2000 / unit->getAttackSpeed())
         {
             unit->attack(this);
             unit->setLastAttackTime();
         }
-
     }
 }
 

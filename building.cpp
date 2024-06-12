@@ -154,7 +154,7 @@ void Barracks::RecruitUnit(int unitType, Game* game) {
     }
 
     int price;
-    for (auto& unit : availableUnits) {
+    for (auto& unit : southUnitPrices) {
         if (unit.type == unitType) {
             price = unit.price;
         }
