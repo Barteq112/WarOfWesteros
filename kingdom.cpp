@@ -3,9 +3,11 @@
 #include "building.h"
 #include <iostream>
 #include <chrono>
+#include <thread>
+#include <cstdlib>
 #include "game.h"
 
-Kingdom::Kingdom() : resources(10000,10) {
+Kingdom::Kingdom() : resources(1000,10) {
     this->getArmy().setOwner(this->owner);
     this->getArmy().setMap(this->map);
 }
@@ -27,7 +29,7 @@ void Kingdom::buildMainCastle(int x, int y)
 
 void Kingdom::buildBarracks(int x, int y)
 {
-    if(map->placeIsAvailable(x,y,barracksSizeX,barracksSizeY)==false || map->isYourPlace(x,y,mainCastleSizeX,mainCastleSizeY,owner)==false)
+    if(map->placeIsAvailable(x,y,barracksSizeX,barracksSizeY)==false || map->isYourPlace(x,y,barracksSizeX,barracksSizeY,owner)==false)
     {
 
         return;
@@ -42,8 +44,9 @@ void Kingdom::buildBarracks(int x, int y)
 
 void Kingdom::buildHouse(int x, int y)
 {
-    if(map->placeIsAvailable(x,y,houseSizeX,houseSizeY)==false || map->isYourPlace(x,y,mainCastleSizeX,mainCastleSizeY,owner)==false)
+    if(map->placeIsAvailable(x,y,houseSizeX,houseSizeY)==false || map->isYourPlace(x,y,houseSizeX,houseSizeY,owner)==false)
     {
+        std::cout<<"dupa";
         return;
     }
     std::shared_ptr<House> house = std::make_shared<House>();
@@ -106,43 +109,83 @@ int Kingdom::checkCastleLevel()
 void Kingdom::autoRun(Game *game)
 {
     // Uruchamia zegar
-    auto last = std::chrono::high_resolution_clock::now();
-    //stawia barki w losowym miejscu w odległości 8 od zamku
-    auto[x,y]= map->findClosestFreeTile(getBuildings().at(0)->getX(), getBuildings().at(0)->getY(),mainCastleSizeX,mainCastleSizeY);
-        buildBarracks(x,y);
-    auto mainCastle = std::dynamic_pointer_cast<MainCastle>(getBuildings().at(0));
-    auto barracks = std::dynamic_pointer_cast<Barracks>(getBuildings().at(1));
-    //stawia dom w losowym miejscu w odległości 8 od zamku
-    int x1 = mainCastle->getX();
-    int y1 = mainCastle->getY();
-    x1 = x1 + (rand() % 16 - 8);
-    y1 = y1 + (rand() % 16 - 8);
-    auto[x11,y11] = map->checkCoordinates(x1,y1);
-    std::cout<<"x1: "<<x11<<" y1: "<<y11<<std::endl;
-    auto[x2,y2]= map->findClosestFreeTile(x11, y11,houseSizeX,houseSizeY,owner);
-    std::cout<<"x2: "<<x2<<" y2: "<<y2<<std::endl;
-    buildHouse(x2,y2);
-    while(0)
-    {
-        if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now()-last).count() >= 20)
+    auto start = std::chrono::high_resolution_clock::now();
+    auto lastRecruitTime = start;
+    auto lastAttackTime = start;
+
+    // Stawia baraki w losowym miejscu w odległości 8 od zamku po 10 sekundach
+    std::thread([this, game, lastRecruitTime, lastAttackTime]() mutable {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        auto [x, y] = map->findClosestFreeTile(getBuildings().at(0)->getX(), getBuildings().at(0)->getY(), mainCastleSizeX, mainCastleSizeY);
+
+        buildBarracks(x, y);
+
+        auto mainCastle = std::dynamic_pointer_cast<MainCastle>(getBuildings().at(0));
+        auto barracks = std::dynamic_pointer_cast<Barracks>(map->getTile(x, y)->getBuilding());
+
+        while (true)
         {
-            //jeżli brak populacji stawia dom
-            if(resources.getPopulation() == 0)
+            auto now = std::chrono::high_resolution_clock::now();
+
+            // Losowe czasy dla rekrutacji i ataku
+            int recruitTime = 2 + std::rand() % 2;  // Losuje liczbę z zakresu 2-3
+            int attackTime = 9 + std::rand() % 4;   // Losuje liczbę z zakresu 9-12
+
+            // Sprawdza czy czas na rekrutację jednostek
+            if (std::chrono::duration_cast<std::chrono::seconds>(now - lastRecruitTime).count() >= recruitTime && getResources().getGold() > 200)
             {
-                auto[x,y]= map->findClosestFreeTile(mainCastle->getX(), mainCastle->getY(),houseSizeX,houseSizeY,owner);
-                buildHouse(x,y);
+                if (resources.getPopulation() <= 0)
+                {
+                    auto [hx, hy] = map->findClosestFreeTile(mainCastle->getX(), mainCastle->getY(), houseSizeX, houseSizeY, owner);
+
+                    buildHouse(hx, hy);
+                }
+                else
+                {
+                    auto availableUnits = southUnitPrices;
+                    int random = std::rand() % 5;
+
+                    int unitType = availableUnits.at(random).type; // Zakładając, że UnitPrice ma pole 'type'
+
+                    barracks->RecruitUnit(unitType, game);
+                }
+                lastRecruitTime = now;
             }
-            //co 20 sekund dodaje jednostki do armii
-            barracks->RecruitUnit(1, game);
-            last = std::chrono::high_resolution_clock::now();
+
+            // Sprawdza czy czas na atak
+            if (std::chrono::duration_cast<std::chrono::seconds>(now - lastAttackTime).count() >= attackTime)
+            {
+                Kingdom* targetKingdom = nullptr;
+                std::vector<Kingdom*> kingdoms = {game->getKingdomSouth(), game->getKingdomNorth(), game->getKingdomBeyondTheWall()};
+
+                // Wybiera losowe królestwo, upewniając się, że nie jest to nullptr ani własne królestwo
+                while (true)
+                {
+                    targetKingdom = kingdoms[std::rand() % kingdoms.size()];
+                    if (targetKingdom != nullptr && targetKingdom != this)
+                    {
+                        break;
+                    }
+                }
+
+                if (targetKingdom)
+                {
+                    auto targetCastle = targetKingdom->getBuildings().at(0);
+                    int targetX = targetCastle->getX();
+                    int targetY = targetCastle->getY();
+
+                    for (auto& unit : getArmy().getUnits())
+                    {
+                        unit->setDestination(targetX, targetY);
+                    }
+                }
+                lastAttackTime = now;
+            }
+
+            // Krótki czas oczekiwania przed następną iteracją
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        {
-
-        }
-    }
-
-
-
+    }).detach();
 }
 
 

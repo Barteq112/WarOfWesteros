@@ -28,19 +28,23 @@ struct UnitPrice
 
 // Stałe struktury reprezentujące ceny jednostek dla każdego królestwa
 const std::vector<UnitPrice> southUnitPrices = {
+    {0, "Giant", 300},
     {1, "Infantry", 100},
     {2, "Archer", 120},
     {3, "Cavalry", 150},
     {4, "Magician", 200},
+    {5, "Wolf", 180},
     {6, "HeavyKnight", 250}
 };
 
 const std::vector<UnitPrice> northUnitPrices = {
+    {0, "Giant", 300},
     {1, "Infantry", 100},
     {2, "Archer", 120},
     {3, "Cavalry", 150},
     {4, "Magician", 200},
-    {5, "Wolf", 180}
+    {5, "Wolf", 180},
+    {6, "HeavyKnight", 250}
 };
 
 const std::vector<UnitPrice> beyondTheWallUnitPrices = {
@@ -48,7 +52,9 @@ const std::vector<UnitPrice> beyondTheWallUnitPrices = {
     {1, "Infantry", 100},
     {2, "Archer", 120},
     {3, "Cavalry", 150},
-    {4, "Magician", 200}
+    {4, "Magician", 200},
+    {5, "Wolf", 180},
+    {6, "HeavyKnight", 250}
 };
 
 

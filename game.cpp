@@ -10,7 +10,7 @@ Game::Game() {
     KingdomSouth = new Kingdom();
     KingdomBeyondTheWall = new Kingdom();
     //inicjalizacja mapy
-    map = new Map(100,50);
+    map = new Map(50,50);
     KingdomSouth->setOwner(0);
     KingdomNorth->setOwner(1);
     KingdomBeyondTheWall->setOwner(2);
@@ -43,8 +43,10 @@ bool Game::isGameEnded()
 // 0 - South, 1 - North, 2 - BeyondTheWall
 void Game::startGame() {
     //Podział mapy
+
     for(int i=0; i<map->getMapWidth(); i++) {
         for(int j=0; j<map->getMapHeight(); j++) {
+
             if(j<map->getMapHeight()/3) {
                 map->getTile(i,j)->setOwner(0);
             } else if(j<2*map->getMapHeight()/3) {
@@ -96,7 +98,8 @@ void Game::autoMoveAttack()
 
     // Pobierz czas początkowy
     auto currentTime = std::chrono::system_clock::now();
-
+    if(allUnits.empty())
+        return;
     // Przemieszaj jednostki
     if(allUnits.size() > 1)
         std::random_shuffle(allUnits.begin(), allUnits.end());
@@ -148,6 +151,7 @@ void Game::drawMap()
 
     while (window.isOpen())
     {
+
         // Obsługa zdarzeń
         sf::Event event;
         while (window.pollEvent(event))
@@ -224,7 +228,7 @@ void Game::drawMap()
             {1, "infantry"},
             {2, "archer"},
             {3, "cavalry"},
-            {4, "magician"},
+            {4, "magican"},
             {5, "wolf"},
             {6, "heavyknight"}
         };

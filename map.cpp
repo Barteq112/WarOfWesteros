@@ -88,20 +88,26 @@ int Map::getMapHeight()
 
 Map_tile* Map::getTile(int x, int y)
 {
+    //Sprawszenie czy w obrębi mapy
+    if (x < 0 || x >= size_x || y < 0 || y >= size_y)
+    {
+        std::cout<<"Error: getTile out of range\n";
+    }
     return &map[x][y];
 }
 
-bool Map::placeIsAvailable(int x, int y, int sizex , int sizey)
-{
-    for(int i = x; i < x + sizex; i++)
-    {
-        for(int j = y; j < y + sizey; j++)
-        {
-            if(getTile(i,j)->getIsAvailable() == false)
-            {
+bool Map::placeIsAvailable(int x, int y, int sizex, int sizey) {
+
+    if (x < 0 || y < 0 || x + sizex > getMapWidth() || y + sizey > getMapHeight()) {
+        return false;
+    }
+
+
+    for (int i = x; i < x + sizex; i++) {
+        for (int j = y; j < y + sizey; j++) {
+            if (!getTile(i, j)->getIsAvailable()) {
                 return false;
             }
-
         }
     }
     return true;
@@ -129,14 +135,16 @@ bool Map::placeIsAvailableForUnit(int x, int y, int sizex, int sizey, std::share
 }
 
 
-bool Map::isYourPlace(int x, int y, int sizex, int sizey, int owner)
-{
-    for(int i = x; i < x + sizex; i++)
-    {
-        for(int j = y; j < y + sizey; j++)
-        {
-            if(getTile(i,j)->getOwner() != owner)
-            {
+bool Map::isYourPlace(int x, int y, int sizex, int sizey, int owner) {
+
+    if (x < 0 || y < 0 || x + sizex > getMapWidth() || y + sizey > getMapHeight()) {
+        return false;
+    }
+
+
+    for (int i = x; i < x + sizex; i++) {
+        for (int j = y; j < y + sizey; j++) {
+            if (getTile(i, j)->getOwner() != owner) {
                 return false;
             }
         }
@@ -308,7 +316,6 @@ std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey)
         tilesToCheck.pop();
 
         if (placeIsAvailable(currentX, currentY, sizex, sizey)) {
-            //std::cout<<std::endl<<currentX<<" "<<currentY<<std::endl;
             return {currentX, currentY};
         }
 
@@ -345,26 +352,10 @@ std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey,
         auto [currentX, currentY] = tilesToCheck.front();
         tilesToCheck.pop();
 
-        bool allTilesBelongToOwner = true;
 
-        // Sprawdzamy, czy wszystkie kafelki pod budynkiem należą do właściciela
-        for (int i = 0; i < sizex; ++i) {
-            for (int j = 0; j < sizey; ++j) {
-                //Sprawdza czy się mieści w granicach mapy
-                if (currentX + i >= getMapWidth() || currentY + j >= getMapHeight()) {
-                    allTilesBelongToOwner = false;
-                    break;
-                }
-                if (getTile(currentX + i, currentY + j)->getOwner() != owner) {
-                    allTilesBelongToOwner = false;
-                    break;
-                }
-            }
-            if (!allTilesBelongToOwner) break;
-        }
 
-        // Jeśli wszystkie kafelki należą do właściciela i miejsce jest dostępne, zwracamy współrzędne
-        if (allTilesBelongToOwner && placeIsAvailable(currentX, currentY, sizex, sizey)) {
+
+        if (placeIsAvailable(currentX, currentY, sizex, sizey) && isYourPlace(currentX, currentY, sizex, sizey,owner)) {
             return {currentX, currentY};
         }
 
@@ -374,7 +365,7 @@ std::pair<int, int> Map::findClosestFreeTile(int x, int y, int sizex, int sizey,
             int newY = currentY + dir[1];
 
             // Sprawdzamy, czy nowe współrzędne są w granicach mapy
-            if (newX >= 0 && newY >= 0 && newX < getMapWidth() && newY < getMapHeight() && !visited[newX][newY]) {
+            if (newX >= 0 && newY >= 0 && newX < getMapWidth()-1 && newY < getMapHeight()-1 && !visited[newX][newY]) {
                 // Sprawdzamy, czy cały obszar (sizex x sizey) mieści się w granicach mapy
                 if (newX + sizex <= getMapWidth() && newY + sizey <= getMapHeight()) {
                     tilesToCheck.push({newX, newY});

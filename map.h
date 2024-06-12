@@ -62,7 +62,6 @@ public:
         {
             map[i].resize(size_y);
         }
-        this->size_x = size_x-1;
     }
     //zwraca szerokość mapy
     int getMapWidth();

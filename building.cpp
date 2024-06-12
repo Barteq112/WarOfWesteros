@@ -152,6 +152,22 @@ void Barracks::RecruitUnit(int unitType, Game* game) {
 
         return;
     }
+
+    int price;
+    for (auto& unit : availableUnits) {
+        if (unit.type == unitType) {
+            price = unit.price;
+        }
+    }
+    if (kingdom->getResources().getGold() < price) {
+        return;
+    }
+    //Sprawdzenie populacji
+    if(kingdom->getResources().getPopulation() <= 0)
+    {
+        return;
+    }
+
     //std::cout<<"test";
     Map* map = game->getMap();
     std::shared_ptr<Unit> unit = nullptr;
@@ -183,26 +199,14 @@ void Barracks::RecruitUnit(int unitType, Game* game) {
     if (unit == nullptr) {
         return;
     }
-    int price;
-    for (auto& unit : availableUnits) {
-        if (unit.type == unitType) {
-             price = unit.price;
-        }
-    }
-    if (kingdom->getResources().getGold() < price) {
-        return;
-    }
-    //Sprawdzenie populacji
-    if(kingdom->getResources().getPopulation() <= 0)
-    {
-        return;
-    }
+
     auto[xx,yy] = map->findClosestFreeTile(x+int(barracksSizeX/2),y+int(barracksSizeY/2),unitSizeX,unitSizeY);
     if(xx==-1)
     {
         return;
     }
     kingdom->getResources().decreaseGold(price);
+    kingdom->getResources().decreasePopulation(1);
     unit->setOwner(owner);
     army->addUnitToList(unit);
     map->setUnitOnMap(xx, yy, unit);

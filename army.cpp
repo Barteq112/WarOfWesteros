@@ -40,8 +40,11 @@ std::vector<std::pair<int, int>> AStar(Map* map, int startX, int startY, int goa
     start.hScore = abs(startX - goalX) + abs(startY - goalY);
     start.fScore = start.gScore + start.hScore;
     openSet.push(start);
-
+    int iterations =0;
     while (!openSet.empty()) {
+        if (iterations++ >= 50000) {
+            return std::vector<std::pair<int, int>>();
+        }
         Node current = openSet.top();
         openSet.pop();
 
@@ -93,21 +96,21 @@ Army::Army() {}
 
 void Army::removeUnitFromList(int x, int y)
 {
+    std::cout << "x "<<x<<"y"<<y<< std::endl;
+    //auto unit = map->getTile(x, y)->getUnit();
+    std::cout << "Usunięto jednostkę z listy jednostek" << std::endl;
+    // if (unit == nullptr)
+    // {
+    //     return;
+    // }
 
-    auto unit = map->getTile(x, y)->getUnit();
-    if (unit == nullptr)
+
+    for (size_t i = 0; i < units.size(); ++i)
     {
-        return;
-    }
-
-
-    for (auto it = units.begin(); it != units.end(); ++it)
-    {
-
-        if ((*it)->getX() == x && (*it)->getY() == y)
+        if (units[i]->getX() == x && units[i]->getY() == y)
         {
+            units.erase(units.begin() + i);
 
-            units.erase(it);
             return;
         }
     }
@@ -144,7 +147,7 @@ void Unit::decreaseHealth(int amount, Game *game) {
 
 void Unit::move(Map* map) {
 
-    if (x == destX && y == destY) {
+    if ((x == destX && y == destY) || health <= 0) {
         return;
     }
     // sprawdzenie czy docelowe pole jest dostępne, jeśli nie to szukamy najbliższego wolnego pola
@@ -230,7 +233,7 @@ Archer::Archer() : Unit(80, 20, 4, 9, 4, 2){maxHealth = health;};
 
 Cavalry::Cavalry() : Unit(200, 40, 2, 5, 6, 3){maxHealth = health;};
 
-Magician::Magician() : Unit(300, 50, 2, 3, 2, 4){maxHealth = health;};
+Magician::Magician() : Unit(300, 10, 2, 3, 2, 4){maxHealth = health;};
 
 Wolf::Wolf() : Unit(300, 50, 2, 3, 5, 5){maxHealth = health;};
 
@@ -290,6 +293,7 @@ void Archer::attack(Game *game) {
     auto unit = map->getClosestEnemy(x, y,range, owner);
     if(unit != nullptr)
     {
+        std::cout<<"attack"<<std::endl;
         unit->decreaseHealth(attackDamage,game);
     }
     else
@@ -298,6 +302,7 @@ void Archer::attack(Game *game) {
         auto building = map->getClosestEnemyBuilding(x,y,range,owner);
         if(building != nullptr)
         {
+
             building->decreaseHealth(attackDamage/2,game);
         }
     }
